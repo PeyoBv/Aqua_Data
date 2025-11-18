@@ -1,0 +1,28 @@
+.bar-chart-container {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chart-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 20px;
+}
+
+.chart-wrapper {
+  height: 400px;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .chart-wrapper {
+    height: 350px;
+  }
+  
+  .bar-chart-container {
+    padding: 16px;
+  }
+}

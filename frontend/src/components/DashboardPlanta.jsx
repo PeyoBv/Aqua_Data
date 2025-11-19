@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { explorarDatos } from '../services/api';
 import './DashboardPlanta.css';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
 export default function DashboardPlanta({ region }) {
   const [plantas, setPlantas] = useState([]);
@@ -18,22 +16,18 @@ export default function DashboardPlanta({ region }) {
 
   const cargarPlantas = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/explorador`, {
-        params: { tipo_dato: 'plantas', region }
-      });
+      const response = await explorarDatos({ tipo_dato: 'plantas', region });
       
-      if (response.data.success && response.data.registros) {
-        // Extraer plantas únicas
-        const plantasUnicas = [...new Set(response.data.registros.map(r => r.planta))]
-          .filter(Boolean)
-          .sort();
-        setPlantas(plantasUnicas);
-        if (plantasUnicas.length > 0) {
-          setPlantaSeleccionada(plantasUnicas[0]);
+      if (response.metadata && response.metadata.plantas_disponibles) {
+        const plantasDisponibles = response.metadata.plantas_disponibles;
+        setPlantas(plantasDisponibles);
+        if (plantasDisponibles.length > 0) {
+          setPlantaSeleccionada(plantasDisponibles[0]);
         }
       }
     } catch (err) {
       console.error('Error cargando plantas:', err);
+      setError('Error al cargar plantas');
     }
   };
 

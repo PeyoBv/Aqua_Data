@@ -97,6 +97,52 @@ class ExploradorService {
   }
 
   /**
+   * Obtiene opciones disponibles para filtros (años, especies, tipos)
+   * @param {Array} datos - Dataset
+   * @param {string} tipoDato - Tipo de dato
+   * @returns {Object} Opciones disponibles
+   */
+  static obtenerOpcionesDisponibles(datos, tipoDato) {
+    const años = new Set();
+    const meses = new Set();
+    const especies = new Set();
+    const tiposElaboracion = new Set();
+    const plantas = new Set();
+
+    datos.forEach(item => {
+      // Años
+      const año = parsearEntero(item.año || item.AÑO || item.anio || item.ANIO);
+      if (año > 0) años.add(año);
+
+      // Meses
+      const mes = parsearEntero(item.mes || item.MES);
+      if (mes >= 1 && mes <= 12) meses.add(mes);
+
+      // Especies
+      const especie = normalizarTexto(item.especie || item.ESPECIE || item.nombre_cientifico || item.NOMBRE_CIENTIFICO);
+      if (especie) especies.add(especie);
+
+      // Tipos de elaboración (solo para producción)
+      if (tipoDato === 'PRODUCCION' || tipoDato === 'PRODUCCIÓN') {
+        const tipo = normalizarTexto(item.tipo_elaboracion || item.TIPO_ELABORACION);
+        if (tipo) tiposElaboracion.add(tipo);
+      }
+
+      // Plantas (código de planta)
+      const cdPlanta = parsearEntero(item.cd_planta || item.CD_PLANTA);
+      if (cdPlanta > 0) plantas.add(cdPlanta);
+    });
+
+    return {
+      años_disponibles: Array.from(años).sort((a, b) => b - a), // Más reciente primero
+      meses_disponibles: Array.from(meses).sort((a, b) => a - b),
+      especies_disponibles: Array.from(especies).sort(),
+      tipos_elaboracion: Array.from(tiposElaboracion).sort(),
+      plantas_disponibles: Array.from(plantas).sort((a, b) => a - b)
+    };
+  }
+
+  /**
    * Calcula estadísticas básicas de un dataset
    * @param {Array} datos - Dataset
    * @param {string} tipoDato - Tipo de dato
@@ -279,12 +325,31 @@ class ExploradorService {
       // Agrupar datos para gráficos
       const graficos = this.agruparDatosParaGraficos(datosFiltrados, tipoNormalizado);
 
+      // Obtener opciones disponibles (sin filtros para tener todas las opciones)
+      const metadata = this.obtenerOpcionesDisponibles(
+        this.filtrarPorRegion(dataset, filtrosNormalizados.region),
+        tipoNormalizado
+      );
+
+      // Crear resumen simplificado para comparaciones
+      const resumen = {
+        total_registros: estadisticas.totalRegistros || 0,
+        total_toneladas: estadisticas.toneladasTotales || 
+                        estadisticas.toneladasMPTotales || 
+                        estadisticas.capacidadTotal || 0,
+        promedio_mensual: graficos.porMes && graficos.porMes.length > 0
+          ? graficos.porMes.reduce((sum, m) => sum + m.toneladas, 0) / graficos.porMes.length
+          : 0
+      };
+
       return {
         success: true,
         tipo_dato: tipoDato,
         filtros: filtrosNormalizados,
         estadisticas,
-        graficos
+        graficos,
+        metadata,
+        resumen
       };
 
     } catch (error) {

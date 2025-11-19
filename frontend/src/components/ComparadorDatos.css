@@ -1,0 +1,388 @@
+.comparador-datos {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.section-header h2 {
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  font-size: 2rem;
+}
+
+.section-description {
+  color: #64748b;
+  font-size: 1.1rem;
+}
+
+/* Configuración */
+.comparacion-config {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.config-row {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.config-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.config-item label {
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+.select-dataset,
+.select-tipo,
+.select-elemento {
+  padding: 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.select-dataset:hover,
+.select-tipo:hover,
+.select-elemento:hover {
+  border-color: #3b82f6;
+}
+
+.select-dataset:focus,
+.select-tipo:focus,
+.select-elemento:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Filtros Globales */
+.filtros-globales {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.filtros-globales h4 {
+  margin-bottom: 1rem;
+  color: #334155;
+  font-size: 1rem;
+}
+
+.filtros-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.filtro-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filtro-item label {
+  font-weight: 500;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.filtro-item select {
+  padding: 0.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.filtro-item select:hover {
+  border-color: #94a3b8;
+}
+
+.filtro-item select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* Selector de Elementos */
+.selector-elementos h4 {
+  margin-bottom: 1rem;
+  color: #334155;
+  font-size: 1rem;
+}
+
+.selector-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.select-elemento {
+  flex: 1;
+}
+
+.btn-limpiar {
+  padding: 0.75rem 1.5rem;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-limpiar:hover:not(:disabled) {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-limpiar:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Elementos Seleccionados */
+.elementos-seleccionados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  min-height: 50px;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  border: 2px dashed #e2e8f0;
+}
+
+.elemento-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.elemento-chip button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.elemento-chip button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Resultados */
+.resultados-comparacion {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.chart-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container h3 {
+  margin-bottom: 1.5rem;
+  color: #1e293b;
+  font-size: 1.3rem;
+}
+
+/* Tabla de Comparación */
+.tabla-comparacion {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.tabla-comparacion h3 {
+  margin-bottom: 1.5rem;
+  color: #1e293b;
+  font-size: 1.3rem;
+}
+
+.tabla-comparacion table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla-comparacion th {
+  background: #f1f5f9;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #475569;
+  border-bottom: 2px solid #cbd5e1;
+}
+
+.tabla-comparacion td {
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tabla-comparacion tbody tr:hover {
+  background: #f8fafc;
+}
+
+.nombre-columna {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.valor-columna {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.porcentaje-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.porcentaje-fill {
+  height: 24px;
+  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+
+.porcentaje-bar span {
+  font-weight: 600;
+  color: #475569;
+  min-width: 50px;
+}
+
+.total-row {
+  background: #f1f5f9;
+  font-weight: bold;
+}
+
+.total-row td {
+  border-top: 2px solid #cbd5e1;
+  color: #1e293b;
+}
+
+/* Estados */
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+  font-size: 1.1rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  color: #475569;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: #94a3b8;
+}
+
+.no-data-message {
+  text-align: center;
+  padding: 2rem;
+  background: #fef2f2;
+  border: 2px solid #fecaca;
+  border-radius: 8px;
+  color: #991b1b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .comparador-datos {
+    padding: 1rem;
+  }
+
+  .config-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .filtros-row {
+    grid-template-columns: 1fr;
+  }
+
+  .selector-row {
+    flex-direction: column;
+  }
+
+  .elementos-seleccionados {
+    flex-direction: column;
+  }
+
+  .tabla-comparacion {
+    overflow-x: scroll;
+  }
+}

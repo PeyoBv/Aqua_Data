@@ -6,7 +6,7 @@ import { explorarDatos } from '../services/api';
 
 /**
  * Vista 2: Explorador de Datos - Análisis Detallado
- * Permite seleccionar dataset y aplicar filtros dinámicos
+ * Permite seleccionar dataset y aplicar filtros dinámicos con selectores
  */
 function ExploradorDatos({ region }) {
   const [tipoDato, setTipoDato] = useState('cosecha');
@@ -15,6 +15,13 @@ function ExploradorDatos({ region }) {
     mes: '',
     especie: '',
     tipo_elaboracion: ''
+  });
+  
+  // Opciones disponibles para los selectores
+  const [opcionesDisponibles, setOpcionesDisponibles] = useState({
+    años: [],
+    especies: [],
+    tiposElaboracion: []
   });
   
   const [data, setData] = useState(null);
@@ -42,6 +49,15 @@ function ExploradorDatos({ region }) {
 
         const response = await explorarDatos(params);
         setData(response);
+        
+        // Actualizar opciones disponibles desde metadata
+        if (response.metadata) {
+          setOpcionesDisponibles({
+            años: response.metadata.años_disponibles || [],
+            especies: response.metadata.especies_disponibles || [],
+            tiposElaboracion: response.metadata.tipos_elaboracion || []
+          });
+        }
       } catch (err) {
         setError('Error al explorar datos. Por favor, intenta nuevamente.');
         console.error('Error fetching explorador data:', err);
@@ -122,15 +138,16 @@ function ExploradorDatos({ region }) {
           {/* Año */}
           <div className="filtro-item">
             <label htmlFor="filtro-anio">Año:</label>
-            <input
+            <select
               id="filtro-anio"
-              type="number"
-              placeholder="Ej: 2013"
               value={filtrosEspecificos.anio}
               onChange={(e) => handleFiltroChange('anio', e.target.value)}
-              min="2000"
-              max="2030"
-            />
+            >
+              <option value="">Todos los años</option>
+              {opcionesDisponibles.años.map(año => (
+                <option key={año} value={año}>{año}</option>
+              ))}
+            </select>
           </div>
 
           {/* Mes */}
@@ -160,26 +177,32 @@ function ExploradorDatos({ region }) {
           {/* Especie */}
           <div className="filtro-item">
             <label htmlFor="filtro-especie">Especie:</label>
-            <input
+            <select
               id="filtro-especie"
-              type="text"
-              placeholder="Ej: Jurel"
               value={filtrosEspecificos.especie}
               onChange={(e) => handleFiltroChange('especie', e.target.value)}
-            />
+            >
+              <option value="">Todas las especies</option>
+              {opcionesDisponibles.especies.slice(0, 50).map(especie => (
+                <option key={especie} value={especie}>{especie}</option>
+              ))}
+            </select>
           </div>
 
           {/* Tipo de Elaboración (solo para Producción) */}
           {tipoDato === 'produccion' && (
             <div className="filtro-item">
               <label htmlFor="filtro-elaboracion">Tipo Elaboración:</label>
-              <input
+              <select
                 id="filtro-elaboracion"
-                type="text"
-                placeholder="Ej: Congelado"
                 value={filtrosEspecificos.tipo_elaboracion}
                 onChange={(e) => handleFiltroChange('tipo_elaboracion', e.target.value)}
-              />
+              >
+                <option value="">Todos los tipos</option>
+                {opcionesDisponibles.tiposElaboracion.map(tipo => (
+                  <option key={tipo} value={tipo}>{tipo}</option>
+                ))}
+              </select>
             </div>
           )}
 

@@ -526,6 +526,451 @@ class FisheryAnalytics:
             'summary': summary
         }
     
+    # ============================================================================
+    # MÉTODOS ESPECÍFICOS PARA MÓDULO DE COSECHAS (DESEMBARQUES)
+    # ============================================================================
+    
+    def get_agent_distribution(
+        self, 
+        year: Optional[int] = None, 
+        region: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Distribución por Tipo de Agente: Industrial vs Artesanal.
+        
+        Propósito: Alimentar un Donut Chart mostrando la participación porcentual
+        de cada tipo de agente (Industrial, Artesanal, etc.) en las capturas.
+        
+        Args:
+            year: Año específico para filtrar (opcional)
+            region: Región específica para filtrar (opcional)
+            
+        Returns:
+            Dict con estructura:
+            {
+                'success': True,
+                'data': [{'tipo_agente': 'Industrial', 'toneladas': 12345.67, 'porcentaje': 65.4}],
+                'summary': {...}
+            }
+        """
+        if 'Tipo de agente' not in self.df_desembarque.columns:
+            return {
+                'success': False,
+                'error': 'Columna "Tipo de agente" no disponible en df_desembarque'
+            }
+        
+        # Crear copia para filtrado
+        df = self.df_desembarque.copy()
+        
+        # Aplicar filtros opcionales
+        if year is not None:
+            df = df[df['Año'] == year]
+        
+        if region is not None:
+            region_upper = region.strip().upper()
+            if 'Región' in df.columns:
+                df = df[df['Región'] == region_upper]
+        
+        # Validar que haya datos después del filtrado
+        if df.empty:
+            return {
+                'success': False,
+                'error': 'No hay datos disponibles para los filtros especificados',
+                'data': [],
+                'summary': {}
+            }
+        
+        # Agrupar por Tipo de agente y sumar toneladas
+        distribution = df.groupby('Tipo de agente', as_index=False).agg({
+            'Toneladas': 'sum'
+        }).rename(columns={'Tipo de agente': 'tipo_agente', 'Toneladas': 'toneladas'})
+        
+        # Manejar valores nulos
+        distribution = distribution.dropna(subset=['tipo_agente'])
+        distribution['toneladas'] = distribution['toneladas'].fillna(0)
+        
+        # Calcular total
+        total_toneladas = distribution['toneladas'].sum()
+        
+        # Calcular porcentajes
+        distribution['porcentaje'] = (
+            (distribution['toneladas'] / total_toneladas * 100) if total_toneladas > 0 else 0
+        ).round(2)
+        
+        # Redondear toneladas
+        distribution['toneladas'] = distribution['toneladas'].round(2)
+        
+        # Ordenar por toneladas descendente
+        distribution = distribution.sort_values('toneladas', ascending=False)
+        
+        # Calcular resumen
+        summary = {
+            'total_toneladas': float(total_toneladas),
+            'num_tipos_agente': len(distribution),
+            'tipo_dominante': distribution.iloc[0]['tipo_agente'] if len(distribution) > 0 else None,
+            'porcentaje_dominante': float(distribution.iloc[0]['porcentaje']) if len(distribution) > 0 else 0
+        }
+        
+        return {
+            'success': True,
+            'analysis_type': 'agent_distribution',
+            'metadata': {
+                'year': year,
+                'region': region,
+                'generated_at': datetime.now().isoformat()
+            },
+            'data': self._to_serializable(distribution),
+            'summary': summary
+        }
+    
+    def get_top_ports(
+        self, 
+        year: Optional[int] = None, 
+        region: Optional[str] = None,
+        top_n: int = 10
+    ) -> Dict[str, Any]:
+        """
+        Ranking de Puertos por Volumen de Capturas.
+        
+        Propósito: Alimentar un Bar Chart horizontal mostrando los puertos
+        con mayor volumen de desembarque.
+        
+        Args:
+            year: Año específico para filtrar (opcional)
+            region: Región específica para filtrar (opcional)
+            top_n: Número de puertos a retornar (default: 10)
+            
+        Returns:
+            Dict con estructura:
+            {
+                'success': True,
+                'data': [{'puerto': 'PUERTO MONTT', 'toneladas': 45678.90, 'ranking': 1}],
+                'summary': {...}
+            }
+        """
+        if 'Puerto' not in self.df_desembarque.columns:
+            return {
+                'success': False,
+                'error': 'Columna "Puerto" no disponible en df_desembarque'
+            }
+        
+        # Crear copia para filtrado
+        df = self.df_desembarque.copy()
+        
+        # Aplicar filtros opcionales
+        if year is not None:
+            df = df[df['Año'] == year]
+        
+        if region is not None:
+            region_upper = region.strip().upper()
+            if 'Región' in df.columns:
+                df = df[df['Región'] == region_upper]
+        
+        # Validar que haya datos después del filtrado
+        if df.empty:
+            return {
+                'success': False,
+                'error': 'No hay datos disponibles para los filtros especificados',
+                'data': [],
+                'summary': {}
+            }
+        
+        # Agrupar por Puerto y sumar toneladas
+        ports = df.groupby('Puerto', as_index=False).agg({
+            'Toneladas': 'sum'
+        }).rename(columns={'Puerto': 'puerto', 'Toneladas': 'toneladas'})
+        
+        # Manejar valores nulos
+        ports = ports.dropna(subset=['puerto'])
+        ports['toneladas'] = ports['toneladas'].fillna(0)
+        
+        # Ordenar por toneladas descendente
+        ports = ports.sort_values('toneladas', ascending=False)
+        
+        # Tomar top N
+        ports = ports.head(top_n)
+        
+        # Agregar ranking
+        ports['ranking'] = range(1, len(ports) + 1)
+        
+        # Redondear toneladas
+        ports['toneladas'] = ports['toneladas'].round(2)
+        
+        # Calcular resumen
+        total_top_n = ports['toneladas'].sum()
+        total_general = df['Toneladas'].sum()
+        
+        summary = {
+            'total_toneladas_top_n': float(total_top_n),
+            'total_toneladas_general': float(total_general),
+            'porcentaje_concentracion': float((total_top_n / total_general * 100).round(2)) if total_general > 0 else 0,
+            'num_puertos_total': int(df['Puerto'].nunique()),
+            'puerto_lider': ports.iloc[0]['puerto'] if len(ports) > 0 else None
+        }
+        
+        return {
+            'success': True,
+            'analysis_type': 'top_ports',
+            'metadata': {
+                'year': year,
+                'region': region,
+                'top_n': top_n,
+                'generated_at': datetime.now().isoformat()
+            },
+            'data': self._to_serializable(ports),
+            'summary': summary
+        }
+    
+    def get_species_by_agent_breakdown(
+        self,
+        year: Optional[int] = None,
+        region: Optional[str] = None,
+        top_n: int = 10
+    ) -> Dict[str, Any]:
+        """
+        Desglose de Especies por Tipo de Agente (Stacked Bar Chart).
+        
+        Propósito: Mostrar las top especies y cuánto captura cada tipo de
+        agente (Industrial vs Artesanal) para cada especie.
+        
+        Args:
+            year: Año específico para filtrar (opcional)
+            region: Región específica para filtrar (opcional)
+            top_n: Número de especies top a analizar (default: 10)
+            
+        Returns:
+            Dict con estructura:
+            {
+                'success': True,
+                'data': [{'especie': 'SALMON', 'Industrial': 12345.67, 'Artesanal': 456.78}],
+                'summary': {...}
+            }
+        """
+        if 'Especie' not in self.df_desembarque.columns:
+            return {
+                'success': False,
+                'error': 'Columna "Especie" no disponible en df_desembarque'
+            }
+        
+        if 'Tipo de agente' not in self.df_desembarque.columns:
+            return {
+                'success': False,
+                'error': 'Columna "Tipo de agente" no disponible en df_desembarque'
+            }
+        
+        # Crear copia para filtrado
+        df = self.df_desembarque.copy()
+        
+        # Aplicar filtros opcionales
+        if year is not None:
+            df = df[df['Año'] == year]
+        
+        if region is not None:
+            region_upper = region.strip().upper()
+            if 'Región' in df.columns:
+                df = df[df['Región'] == region_upper]
+        
+        # Validar que haya datos después del filtrado
+        if df.empty:
+            return {
+                'success': False,
+                'error': 'No hay datos disponibles para los filtros especificados',
+                'data': [],
+                'summary': {}
+            }
+        
+        # Paso 1: Identificar top N especies por volumen total
+        top_species = df.groupby('Especie', as_index=False).agg({
+            'Toneladas': 'sum'
+        }).sort_values('Toneladas', ascending=False).head(top_n)
+        
+        top_species_list = top_species['Especie'].tolist()
+        
+        # Paso 2: Filtrar dataframe solo para esas especies
+        df_filtered = df[df['Especie'].isin(top_species_list)]
+        
+        # Paso 3: Crear pivot por Especie y Tipo de agente
+        breakdown = df_filtered.pivot_table(
+            index='Especie',
+            columns='Tipo de agente',
+            values='Toneladas',
+            aggfunc='sum',
+            fill_value=0
+        ).reset_index()
+        
+        # Renombrar columna de especie
+        breakdown = breakdown.rename(columns={'Especie': 'especie'})
+        
+        # Calcular total por especie
+        agent_columns = [col for col in breakdown.columns if col != 'especie']
+        breakdown['total'] = breakdown[agent_columns].sum(axis=1)
+        
+        # Ordenar por total descendente
+        breakdown = breakdown.sort_values('total', ascending=False)
+        
+        # Redondear valores
+        for col in agent_columns + ['total']:
+            breakdown[col] = breakdown[col].round(2)
+        
+        # Calcular resumen
+        summary = {
+            'num_especies': len(breakdown),
+            'tipos_agente': agent_columns,
+            'total_toneladas': float(breakdown['total'].sum()),
+            'especie_lider': breakdown.iloc[0]['especie'] if len(breakdown) > 0 else None,
+            'participacion_por_tipo': {
+                agente: float(breakdown[agente].sum())
+                for agente in agent_columns
+            }
+        }
+        
+        return {
+            'success': True,
+            'analysis_type': 'species_by_agent_breakdown',
+            'metadata': {
+                'year': year,
+                'region': region,
+                'top_n': top_n,
+                'generated_at': datetime.now().isoformat()
+            },
+            'data': self._to_serializable(breakdown),
+            'summary': summary
+        }
+    
+    def get_seasonal_context(
+        self,
+        current_year: int = 2023,
+        region: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Contexto Estacional: Año Actual vs Promedio Histórico.
+        
+        Propósito: Comparar el desempeño mensual del año actual contra
+        el promedio histórico de años anteriores (línea de tiempo comparativa).
+        
+        Args:
+            current_year: Año actual a comparar (default: 2023)
+            region: Región específica para filtrar (opcional)
+            
+        Returns:
+            Dict con estructura:
+            {
+                'success': True,
+                'data': [
+                    {'mes': 1, 'mes_nombre': 'Enero', 'actual': 1234.56, 'historico': 1100.23},
+                    ...
+                ],
+                'summary': {...}
+            }
+        """
+        if 'Mes' not in self.df_desembarque.columns:
+            return {
+                'success': False,
+                'error': 'Columna "Mes" no disponible en df_desembarque'
+            }
+        
+        # Crear copia para filtrado
+        df = self.df_desembarque.copy()
+        
+        # Aplicar filtro regional si se especifica
+        if region is not None:
+            region_upper = region.strip().upper()
+            if 'Región' in df.columns:
+                df = df[df['Región'] == region_upper]
+        
+        # Validar que haya datos
+        if df.empty:
+            return {
+                'success': False,
+                'error': 'No hay datos disponibles para los filtros especificados',
+                'data': [],
+                'summary': {}
+            }
+        
+        # Paso 1: Calcular suma mensual para el año actual
+        df_actual = df[df['Año'] == current_year].groupby('Mes', as_index=False).agg({
+            'Toneladas': 'sum'
+        }).rename(columns={'Toneladas': 'actual'})
+        
+        # Paso 2: Calcular promedio mensual histórico (años anteriores)
+        df_historico = df[df['Año'] < current_year].groupby('Mes', as_index=False).agg({
+            'Toneladas': 'mean'
+        }).rename(columns={'Toneladas': 'historico'})
+        
+        # Paso 3: Merge por mes
+        seasonal = pd.merge(
+            df_actual,
+            df_historico,
+            on='Mes',
+            how='outer'
+        ).fillna(0)
+        
+        # Asegurar que tengamos todos los 12 meses
+        all_months = pd.DataFrame({'Mes': range(1, 13)})
+        seasonal = pd.merge(
+            all_months,
+            seasonal,
+            on='Mes',
+            how='left'
+        ).fillna(0)
+        
+        # Agregar nombres de meses
+        meses_nombres = {
+            1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril',
+            5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto',
+            9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
+        }
+        seasonal['mes_nombre'] = seasonal['Mes'].map(meses_nombres)
+        
+        # Renombrar mes a minúscula
+        seasonal = seasonal.rename(columns={'Mes': 'mes'})
+        
+        # Redondear valores
+        seasonal['actual'] = seasonal['actual'].round(2)
+        seasonal['historico'] = seasonal['historico'].round(2)
+        
+        # Calcular diferencia
+        seasonal['diferencia'] = (seasonal['actual'] - seasonal['historico']).round(2)
+        seasonal['variacion_porcentual'] = np.where(
+            seasonal['historico'] > 0,
+            ((seasonal['actual'] - seasonal['historico']) / seasonal['historico'] * 100).round(2),
+            0
+        )
+        
+        # Ordenar por mes
+        seasonal = seasonal.sort_values('mes')
+        
+        # Calcular resumen
+        total_actual = seasonal['actual'].sum()
+        total_historico = seasonal['historico'].sum()
+        
+        summary = {
+            'año_actual': current_year,
+            'años_historicos_incluidos': int(df[df['Año'] < current_year]['Año'].nunique()),
+            'total_actual': float(total_actual),
+            'total_historico': float(total_historico),
+            'diferencia_total': float((total_actual - total_historico).round(2)),
+            'variacion_anual': float(((total_actual - total_historico) / total_historico * 100).round(2)) if total_historico > 0 else 0,
+            'mes_mayor_actual': meses_nombres[seasonal.loc[seasonal['actual'].idxmax(), 'mes']] if total_actual > 0 else None,
+            'mes_mayor_historico': meses_nombres[seasonal.loc[seasonal['historico'].idxmax(), 'mes']] if total_historico > 0 else None
+        }
+        
+        return {
+            'success': True,
+            'analysis_type': 'seasonal_context',
+            'metadata': {
+                'current_year': current_year,
+                'region': region,
+                'generated_at': datetime.now().isoformat()
+            },
+            'data': self._to_serializable(seasonal),
+            'summary': summary
+        }
+    
+    # ============================================================================
+    # MÉTODOS DE ANÁLISIS GENERAL
+    # ============================================================================
+    
     def get_plant_capacity_analysis(self) -> Dict[str, Any]:
         """
         Capacidad vs Producción: Productividad por Planta.

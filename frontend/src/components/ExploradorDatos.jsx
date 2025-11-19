@@ -19,9 +19,9 @@ function ExploradorDatos({ region }) {
   
   // Opciones disponibles para los selectores
   const [opcionesDisponibles, setOpcionesDisponibles] = useState({
-    años: [],
-    especies: [],
-    tiposElaboracion: []
+    años: [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010], // Valores por defecto
+    especies: ['SALMON DEL ATLANTICO', 'JUREL', 'MERLUZA COMUN', 'SARDINA ESPAÑOLA', 'ANCHOVETA', 'CONGRIO DORADO', 'JIBIA', 'REINETA', 'BLANQUILLO', 'PEJERREY'], // Valores por defecto
+    tiposElaboracion: ['CONGELADO', 'FRESCO', 'CONSERVA', 'REDUCCION']
   });
   
   const [data, setData] = useState(null);
@@ -33,15 +33,27 @@ function ExploradorDatos({ region }) {
     const fetchOpciones = async () => {
       try {
         const response = await obtenerOpcionesDisponibles();
-        if (response.success && response.opciones) {
-          setOpcionesDisponibles({
+        console.log('✅ Respuesta del servidor:', response);
+        
+        if (response && response.success && response.opciones) {
+          const nuevasOpciones = {
             años: response.opciones.años_disponibles || [],
             especies: response.opciones.especies_disponibles || [],
             tiposElaboracion: response.opciones.tipos_elaboracion || []
+          };
+          
+          console.log('✅ Opciones cargadas:', {
+            años: nuevasOpciones.años.length,
+            especies: nuevasOpciones.especies.length,
+            tipos: nuevasOpciones.tiposElaboracion.length
           });
+          
+          setOpcionesDisponibles(nuevasOpciones);
+        } else {
+          console.error('❌ Respuesta inválida:', response);
         }
       } catch (err) {
-        console.error('Error cargando opciones:', err);
+        console.error('❌ Error cargando opciones:', err);
       }
     };
     
@@ -151,13 +163,22 @@ function ExploradorDatos({ region }) {
             <label htmlFor="filtro-anio">Año:</label>
             <select
               id="filtro-anio"
-              value={filtrosEspecificos.anio}
-              onChange={(e) => handleFiltroChange('anio', e.target.value)}
+              value={filtrosEspecificos.anio || ''}
+              onChange={(e) => {
+                const valor = e.target.value;
+                console.log('📅 Año seleccionado:', valor);
+                handleFiltroChange('anio', valor);
+              }}
+              className="filtro-select"
             >
               <option value="">Todos los años</option>
-              {opcionesDisponibles.años.map(año => (
-                <option key={año} value={año}>{año}</option>
-              ))}
+              {opcionesDisponibles.años && opcionesDisponibles.años.length > 0 ? (
+                opcionesDisponibles.años.map(año => (
+                  <option key={año} value={año}>{año}</option>
+                ))
+              ) : (
+                <option disabled>Cargando...</option>
+              )}
             </select>
           </div>
 
@@ -166,8 +187,9 @@ function ExploradorDatos({ region }) {
             <label htmlFor="filtro-mes">Mes:</label>
             <select
               id="filtro-mes"
-              value={filtrosEspecificos.mes}
+              value={filtrosEspecificos.mes || ''}
               onChange={(e) => handleFiltroChange('mes', e.target.value)}
+              className="filtro-select"
             >
               <option value="">Todos</option>
               <option value="1">Enero</option>
@@ -190,13 +212,22 @@ function ExploradorDatos({ region }) {
             <label htmlFor="filtro-especie">Especie:</label>
             <select
               id="filtro-especie"
-              value={filtrosEspecificos.especie}
-              onChange={(e) => handleFiltroChange('especie', e.target.value)}
+              value={filtrosEspecificos.especie || ''}
+              onChange={(e) => {
+                const valor = e.target.value;
+                console.log('🐟 Especie seleccionada:', valor);
+                handleFiltroChange('especie', valor);
+              }}
+              className="filtro-select"
             >
               <option value="">Todas las especies</option>
-              {opcionesDisponibles.especies.slice(0, 50).map(especie => (
-                <option key={especie} value={especie}>{especie}</option>
-              ))}
+              {opcionesDisponibles.especies && opcionesDisponibles.especies.length > 0 ? (
+                opcionesDisponibles.especies.slice(0, 100).map(especie => (
+                  <option key={especie} value={especie}>{especie}</option>
+                ))
+              ) : (
+                <option disabled>Cargando...</option>
+              )}
             </select>
           </div>
 
@@ -206,13 +237,22 @@ function ExploradorDatos({ region }) {
               <label htmlFor="filtro-elaboracion">Tipo Elaboración:</label>
               <select
                 id="filtro-elaboracion"
-                value={filtrosEspecificos.tipo_elaboracion}
-                onChange={(e) => handleFiltroChange('tipo_elaboracion', e.target.value)}
+                value={filtrosEspecificos.tipo_elaboracion || ''}
+                onChange={(e) => {
+                  const valor = e.target.value;
+                  console.log('⚙️ Tipo elaboración seleccionado:', valor);
+                  handleFiltroChange('tipo_elaboracion', valor);
+                }}
+                className="filtro-select"
               >
                 <option value="">Todos los tipos</option>
-                {opcionesDisponibles.tiposElaboracion.map(tipo => (
-                  <option key={tipo} value={tipo}>{tipo}</option>
-                ))}
+                {opcionesDisponibles.tiposElaboracion && opcionesDisponibles.tiposElaboracion.length > 0 ? (
+                  opcionesDisponibles.tiposElaboracion.map(tipo => (
+                    <option key={tipo} value={tipo}>{tipo}</option>
+                  ))
+                ) : (
+                  <option disabled>Cargando...</option>
+                )}
               </select>
             </div>
           )}

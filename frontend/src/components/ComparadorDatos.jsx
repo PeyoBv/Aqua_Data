@@ -160,45 +160,89 @@ function ComparadorDatos({ region }) {
       {/* Configuración de Comparación */}
       <div className="comparacion-config">
         <div className="config-row">
-          {/* Selector de Dataset */}
-          <div className="config-item">
-            <label>Dataset:</label>
-            <select 
-              value={dataset} 
-              onChange={(e) => {
-                setDataset(e.target.value);
-                limpiarComparacion();
-              }}
-              className="select-dataset"
-            >
-              <option value="cosecha">🎣 Cosechas</option>
-              <option value="produccion">🏭 Producción</option>
-              <option value="plantas">🏗️ Plantas</option>
-            </select>
+          {/* Selector de Dataset con botones */}
+          <div className="config-section">
+            <label>Paso 1: Selecciona el Dataset</label>
+            <div className="dataset-buttons-group">
+              <button 
+                className={`dataset-btn ${dataset === 'cosecha' ? 'active' : ''}`}
+                onClick={() => {
+                  setDataset('cosecha');
+                  limpiarComparacion();
+                }}
+              >
+                🎣 Cosechas
+              </button>
+              <button 
+                className={`dataset-btn ${dataset === 'produccion' ? 'active' : ''}`}
+                onClick={() => {
+                  setDataset('produccion');
+                  limpiarComparacion();
+                }}
+              >
+                🏭 Producción
+              </button>
+              <button 
+                className={`dataset-btn ${dataset === 'plantas' ? 'active' : ''}`}
+                onClick={() => {
+                  setDataset('plantas');
+                  limpiarComparacion();
+                }}
+              >
+                🏗️ Plantas
+              </button>
+            </div>
           </div>
 
-          {/* Tipo de Comparación */}
-          <div className="config-item">
-            <label>Comparar por:</label>
-            <select 
-              value={tipoComparacion} 
-              onChange={(e) => {
-                setTipoComparacion(e.target.value);
-                limpiarComparacion();
-              }}
-              className="select-tipo"
-            >
-              <option value="especies">🐟 Especies</option>
-              <option value="años">📅 Años</option>
-              <option value="meses">📆 Meses</option>
-              {dataset === 'produccion' && <option value="elaboracion">⚙️ Tipo Elaboración</option>}
-            </select>
+          {/* Tipo de Comparación con botones */}
+          <div className="config-section">
+            <label>Paso 2: ¿Qué quieres comparar?</label>
+            <div className="tipo-buttons-group">
+              <button 
+                className={`tipo-btn ${tipoComparacion === 'especies' ? 'active' : ''}`}
+                onClick={() => {
+                  setTipoComparacion('especies');
+                  limpiarComparacion();
+                }}
+              >
+                🐟 Especies
+              </button>
+              <button 
+                className={`tipo-btn ${tipoComparacion === 'años' ? 'active' : ''}`}
+                onClick={() => {
+                  setTipoComparacion('años');
+                  limpiarComparacion();
+                }}
+              >
+                📅 Años
+              </button>
+              <button 
+                className={`tipo-btn ${tipoComparacion === 'meses' ? 'active' : ''}`}
+                onClick={() => {
+                  setTipoComparacion('meses');
+                  limpiarComparacion();
+                }}
+              >
+                📆 Meses
+              </button>
+              {dataset === 'produccion' && (
+                <button 
+                  className={`tipo-btn ${tipoComparacion === 'elaboracion' ? 'active' : ''}`}
+                  onClick={() => {
+                    setTipoComparacion('elaboracion');
+                    limpiarComparacion();
+                  }}
+                >
+                  ⚙️ Tipo Elaboración
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Filtros Globales */}
         <div className="filtros-globales">
-          <h4>Filtros Adicionales (Aplicados a todas las comparaciones):</h4>
+          <h4>Paso 3: Filtros Adicionales (Opcional - Se aplican a todas las comparaciones)</h4>
           <div className="filtros-row">
             {tipoComparacion !== 'años' && (
               <div className="filtro-item">
@@ -264,7 +308,8 @@ function ComparadorDatos({ region }) {
 
         {/* Selector de Elementos a Comparar */}
         <div className="selector-elementos">
-          <h4>Selecciona elementos para comparar:</h4>
+          <h4>Paso 4: Selecciona los elementos que quieres comparar</h4>
+          <p className="helper-text">💡 Puedes agregar múltiples elementos para compararlos visualmente</p>
           <div className="selector-row">
             <select 
               className="select-elemento"
@@ -274,14 +319,14 @@ function ComparadorDatos({ region }) {
               }}
               disabled={loading}
             >
-              <option value="">-- Seleccionar {tipoComparacion} --</option>
+              <option value="">➕ Agregar {tipoComparacion} para comparar...</option>
               {getOpcionesSegunTipo().map(opcion => (
                 <option 
                   key={opcion} 
                   value={opcion}
                   disabled={elementosComparar.includes(opcion)}
                 >
-                  {formatearNombre(opcion)}
+                  {formatearNombre(opcion)} {elementosComparar.includes(opcion) ? '✓' : ''}
                 </option>
               ))}
             </select>

@@ -49,7 +49,38 @@ class ExploradorController {
    */
   static async obtenerOpcionesDisponibles(req, res) {
     try {
-      const opciones = ExploradorService.obtenerOpcionesDisponibles();
+      const dataStore = require('../data/dataStore');
+      
+      // Obtener todos los datasets
+      const cosechas = dataStore.getDesembarques();
+      const produccion = dataStore.getMateriaPrimaProduccion();
+      
+      // Combinar todos los datos para obtener todas las opciones
+      const todosDatos = [...cosechas, ...produccion];
+      
+      const años = new Set();
+      const especies = new Set();
+      const tiposElaboracion = new Set();
+      
+      todosDatos.forEach(item => {
+        // Años
+        const año = parseInt(item.año || item.AÑO || item.anio || item.ANIO);
+        if (año && !isNaN(año) && año > 1900) años.add(año);
+        
+        // Especies
+        const especie = (item.especie || item.ESPECIE || '').trim();
+        if (especie) especies.add(especie);
+        
+        // Tipos de elaboración
+        const tipo = (item.tipo_elaboracion || item.TIPO_ELABORACION || '').trim();
+        if (tipo) tiposElaboracion.add(tipo);
+      });
+      
+      const opciones = {
+        años_disponibles: Array.from(años).sort((a, b) => b - a),
+        especies_disponibles: Array.from(especies).sort(),
+        tipos_elaboracion: Array.from(tiposElaboracion).sort()
+      };
       
       res.json({
         success: true,

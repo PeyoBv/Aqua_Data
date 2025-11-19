@@ -31,8 +31,90 @@
 
 .config-row {
   display: flex;
+  flex-direction: column;
   gap: 2rem;
   margin-bottom: 2rem;
+}
+
+.config-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.config-section label {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Botones de Dataset */
+.dataset-buttons-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.dataset-btn {
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.dataset-btn:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.dataset-btn.active {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Botones de Tipo */
+.tipo-buttons-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.tipo-btn {
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.tipo-btn:hover {
+  border-color: #10b981;
+  background: #f0fdf4;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+.tipo-btn.active {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-color: #059669;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .config-item {
@@ -80,12 +162,14 @@
   padding: 1.5rem;
   border-radius: 8px;
   margin-bottom: 1.5rem;
+  border-left: 4px solid #f59e0b;
 }
 
 .filtros-globales h4 {
   margin-bottom: 1rem;
-  color: #334155;
+  color: #1e293b;
   font-size: 1rem;
+  font-weight: 600;
 }
 
 .filtros-row {
@@ -128,9 +212,17 @@
 
 /* Selector de Elementos */
 .selector-elementos h4 {
+  margin-bottom: 0.5rem;
+  color: #1e293b;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.helper-text {
+  color: #64748b;
+  font-size: 0.9rem;
   margin-bottom: 1rem;
-  color: #334155;
-  font-size: 1rem;
+  font-style: italic;
 }
 
 .selector-row {

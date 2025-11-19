@@ -284,8 +284,20 @@ body {
   margin-bottom: 6px;
 }
 
+.filtro-activo {
+  display: inline-block;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  margin-left: 8px;
+  font-weight: 700;
+}
+
 .filtro-item input,
-.filtro-item select {
+.filtro-item select,
+.filtro-select {
   width: 100%;
   padding: 10px 12px;
   border: 2px solid var(--border-color);
@@ -294,10 +306,28 @@ body {
   color: var(--text-primary);
   background: white;
   transition: var(--transition);
+  cursor: pointer;
+  appearance: auto;
+  -webkit-appearance: menulist;
+  -moz-appearance: menulist;
+}
+
+.filtro-item select option {
+  padding: 8px;
+  background: white;
+  color: var(--text-primary);
+}
+
+.filtro-item select.has-value,
+.filtro-select:not([value=""]) {
+  border-color: #10b981;
+  background: #f0fdf4;
+  font-weight: 600;
 }
 
 .filtro-item input:focus,
-.filtro-item select:focus {
+.filtro-item select:focus,
+.filtro-select:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);

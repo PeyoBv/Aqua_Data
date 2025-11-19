@@ -129,6 +129,9 @@ function ExploradorDatos({ region }) {
         const regionFilter = region !== 'TODAS' ? region : null;
 
         // Llamadas paralelas a todas las APIs del módulo de Cosechas
+        // NOTA: Estos endpoints aún no están implementados en el backend
+        // Por ahora se comentan para no romper la aplicación
+        /* 
         const [agentDist, ports, speciesBreak, seasonal] = await Promise.all([
           getAgentDistribution(year, regionFilter),
           getTopPorts(year, regionFilter, 5),
@@ -141,6 +144,15 @@ function ExploradorDatos({ region }) {
           topPorts: ports,
           speciesBreakdown: speciesBreak,
           seasonalContext: seasonal
+        });
+        */
+        
+        // Datos mock temporales para desarrollo
+        setDataCosechas({
+          agentDistribution: null,
+          topPorts: null,
+          speciesBreakdown: null,
+          seasonalContext: null
         });
       } catch (err) {
         console.error('Error fetching cosechas module data:', err);
@@ -412,11 +424,12 @@ function ExploradorDatos({ region }) {
           </div>
 
           {/* NUEVAS GRÁFICAS DEL MÓDULO DE COSECHAS */}
+          {/* NOTA: Sección comentada temporalmente hasta implementar endpoints en backend */}
+          {/*
           {tipoDato === 'cosecha' && !loadingCosechas && dataCosechas && (
             <div className="cosechas-module-section">
               <h3 className="module-title">📊 Análisis Avanzado de Cosechas</h3>
               
-              {/* Fila 1: Distribución por Agente y Top Puertos */}
               <div className="charts-row">
                 <div className="chart-container chart-half">
                   <DonutChart
@@ -434,7 +447,6 @@ function ExploradorDatos({ region }) {
                 </div>
               </div>
 
-              {/* Fila 2: Especies por Agente (Stacked Bar) */}
               <div className="chart-container chart-full">
                 {dataCosechas.speciesBreakdown?.data && dataCosechas.speciesBreakdown.data.length > 0 && (
                   <StackedBarChart
@@ -445,7 +457,6 @@ function ExploradorDatos({ region }) {
                 )}
               </div>
 
-              {/* Fila 3: Comparación Estacional */}
               <div className="chart-container chart-full">
                 {dataCosechas.seasonalContext?.data && dataCosechas.seasonalContext.data.length > 0 && (
                   <MultiLineChart
@@ -473,6 +484,7 @@ function ExploradorDatos({ region }) {
               </div>
             </div>
           )}
+          */}
 
           {/* Gráficos */}
           <div className="charts-section">

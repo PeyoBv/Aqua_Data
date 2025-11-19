@@ -80,16 +80,6 @@ function App() {
         {vistaActual === 'planta' && (
           <DashboardPlanta region={regionSeleccionada} />
         )}
-        </button>
-      </nav>
-
-      {/* Renderizar vista actual */}
-      <main className="app-main">
-        {vistaActual === 'panorama' ? (
-          <PanoramaRegional region={regionSeleccionada} />
-        ) : (
-          <ExploradorDatos region={regionSeleccionada} />
-        )}
       </main>
 
       {/* Footer */}

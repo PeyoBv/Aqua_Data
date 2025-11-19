@@ -35,12 +35,12 @@ class CosechasModuleController {
       // Aplicar filtros
       if (year) {
         const yearNum = parseInt(year);
-        data = data.filter(row => row['Año'] === yearNum);
+        data = data.filter(row => parseInt(row.año) === yearNum);
       }
 
       if (region && region !== 'TODAS') {
         const regionUpper = region.toUpperCase().trim();
-        data = data.filter(row => row['Región'] && row['Región'].toUpperCase().trim() === regionUpper);
+        data = data.filter(row => row.region && row.region.toUpperCase().trim() === regionUpper);
       }
 
       // Validar que haya datos después del filtrado
@@ -57,8 +57,8 @@ class CosechasModuleController {
       const agentMap = new Map();
       
       data.forEach(row => {
-        const tipoAgente = row['Tipo de agente'];
-        const toneladas = parseFloat(row['Toneladas']) || 0;
+        const tipoAgente = row.tipo_agente;
+        const toneladas = parseFloat(row.toneladas) || 0;
         
         if (tipoAgente) {
           const current = agentMap.get(tipoAgente) || 0;
@@ -145,12 +145,12 @@ class CosechasModuleController {
       // Aplicar filtros
       if (year) {
         const yearNum = parseInt(year);
-        data = data.filter(row => row['Año'] === yearNum);
+        data = data.filter(row => parseInt(row.año) === yearNum);
       }
 
       if (region && region !== 'TODAS') {
         const regionUpper = region.toUpperCase().trim();
-        data = data.filter(row => row['Región'] && row['Región'].toUpperCase().trim() === regionUpper);
+        data = data.filter(row => row.region && row.region.toUpperCase().trim() === regionUpper);
       }
 
       // Validar que haya datos
@@ -167,8 +167,8 @@ class CosechasModuleController {
       const portMap = new Map();
       
       data.forEach(row => {
-        const puerto = row['Puerto'];
-        const toneladas = parseFloat(row['Toneladas']) || 0;
+        const puerto = row.puerto_desembarque;
+        const toneladas = parseFloat(row.toneladas) || 0;
         
         if (puerto) {
           const current = portMap.get(puerto) || 0;
@@ -259,12 +259,12 @@ class CosechasModuleController {
       // Aplicar filtros
       if (year) {
         const yearNum = parseInt(year);
-        data = data.filter(row => row['Año'] === yearNum);
+        data = data.filter(row => parseInt(row.año) === yearNum);
       }
 
       if (region && region !== 'TODAS') {
         const regionUpper = region.toUpperCase().trim();
-        data = data.filter(row => row['Región'] && row['Región'].toUpperCase().trim() === regionUpper);
+        data = data.filter(row => row.region && row.region.toUpperCase().trim() === regionUpper);
       }
 
       if (data.length === 0) {
@@ -280,8 +280,8 @@ class CosechasModuleController {
       const speciesMap = new Map();
       
       data.forEach(row => {
-        const especie = row['Especie'];
-        const toneladas = parseFloat(row['Toneladas']) || 0;
+        const especie = row.especie;
+        const toneladas = parseFloat(row.toneladas) || 0;
         
         if (especie) {
           const current = speciesMap.get(especie) || 0;
@@ -298,16 +298,16 @@ class CosechasModuleController {
       const topSpeciesList = new Set(speciesArray.map(s => s.especie));
 
       // Paso 2: Filtrar datos solo para esas especies
-      const filteredData = data.filter(row => topSpeciesList.has(row['Especie']));
+      const filteredData = data.filter(row => topSpeciesList.has(row.especie));
 
       // Paso 3: Crear pivot por Especie y Tipo de agente
       const pivotMap = new Map();
       const agentTypes = new Set();
 
       filteredData.forEach(row => {
-        const especie = row['Especie'];
-        const tipoAgente = row['Tipo de agente'];
-        const toneladas = parseFloat(row['Toneladas']) || 0;
+        const especie = row.especie;
+        const tipoAgente = row.tipo_agente;
+        const toneladas = parseFloat(row.toneladas) || 0;
 
         if (especie && tipoAgente) {
           agentTypes.add(tipoAgente);
@@ -412,7 +412,7 @@ class CosechasModuleController {
       // Aplicar filtro regional
       if (region && region !== 'TODAS') {
         const regionUpper = region.toUpperCase().trim();
-        data = data.filter(row => row['Región'] && row['Región'].toUpperCase().trim() === regionUpper);
+        data = data.filter(row => row.region && row.region.toUpperCase().trim() === regionUpper);
       }
 
       if (data.length === 0) {
@@ -425,14 +425,14 @@ class CosechasModuleController {
       }
 
       // Separar datos del año actual y años históricos
-      const currentYearData = data.filter(row => row['Año'] === currentYear);
-      const historicalData = data.filter(row => row['Año'] < currentYear);
+      const currentYearData = data.filter(row => parseInt(row.año) === currentYear);
+      const historicalData = data.filter(row => parseInt(row.año) < currentYear);
 
       // Calcular suma mensual para el año actual
       const currentMonthMap = new Map();
       currentYearData.forEach(row => {
-        const mes = row['Mes'];
-        const toneladas = parseFloat(row['Toneladas']) || 0;
+        const mes = parseInt(row.mes);
+        const toneladas = parseFloat(row.toneladas) || 0;
         
         if (mes) {
           const current = currentMonthMap.get(mes) || 0;
@@ -445,8 +445,8 @@ class CosechasModuleController {
       const historicalCountMap = new Map();
 
       historicalData.forEach(row => {
-        const mes = row['Mes'];
-        const toneladas = parseFloat(row['Toneladas']) || 0;
+        const mes = parseInt(row.mes);
+        const toneladas = parseFloat(row.toneladas) || 0;
         
         if (mes) {
           const currentSum = historicalMonthMap.get(mes) || 0;
@@ -499,7 +499,7 @@ class CosechasModuleController {
       const mesMaxHistorico = seasonal.reduce((max, m) => m.historico > max.historico ? m : max, seasonal[0]);
 
       // Contar años históricos únicos
-      const añosHistoricos = new Set(historicalData.map(row => row['Año']));
+      const añosHistoricos = new Set(historicalData.map(row => parseInt(row.año)));
 
       const summary = {
         año_actual: currentYear,

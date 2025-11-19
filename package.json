@@ -1,6 +1,6 @@
 {
   "name": "aqua-data",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Sistema de Análisis Pesquero - Macro-Zona Sur de Chile",
   "main": "server.js",
   "engines": {

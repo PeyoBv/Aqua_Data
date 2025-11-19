@@ -181,7 +181,8 @@ class ExploradorService {
       if (tipoNormalizado.includes('COSECHA') || tipoNormalizado.includes('DESEMBARQUE')) {
         toneladas = parsearDecimal(item.toneladas || 0);
       } else if (tipoNormalizado.includes('PRODUCCION')) {
-        toneladas = parsearDecimal(item.toneladas_elaboradas || item.toneladas_mp || 0);
+        // Para producción, usar materia prima como métrica principal
+        toneladas = parsearDecimal(item.toneladas_mp || 0);
       }
       
       // Agrupar por mes

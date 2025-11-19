@@ -28,6 +28,7 @@ app.use('/api', routes);
 
 // Puerto del servidor
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 
 // Función para iniciar el servidor
 async function startServer() {
@@ -44,8 +45,9 @@ async function startServer() {
     console.log(`   - Plantas: ${stats.plantas.count} registros\n`);
 
     // Iniciar servidor
-    app.listen(PORT, () => {
-      console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`);
+    app.listen(PORT, HOST, () => {
+      console.log(`🚀 Servidor ejecutándose en http://${HOST}:${PORT}`);
+      console.log(`📍 Entorno: ${process.env.NODE_ENV || 'development'}`);
     });
   } catch (error) {
     console.error('❌ Error al iniciar el servidor:', error);

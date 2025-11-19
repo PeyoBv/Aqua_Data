@@ -101,11 +101,22 @@ function ExploradorDatos({ region }) {
         if (filtrosEspecificos.especie) params.especie = filtrosEspecificos.especie;
         if (filtrosEspecificos.tipo_elaboracion) params.tipo_elaboracion = filtrosEspecificos.tipo_elaboracion;
 
+        console.log('🔍 Explorando datos con parámetros:', params);
         const response = await explorarDatos(params);
-        setData(response);
+        console.log('✅ Datos recibidos:', response);
+        
+        if (!response || !response.success) {
+          console.error('❌ Respuesta inválida del servidor:', response);
+          setError('Error: Respuesta inválida del servidor');
+          setData(null);
+        } else {
+          setData(response);
+        }
       } catch (err) {
-        setError('Error al explorar datos. Por favor, intenta nuevamente.');
-        console.error('Error fetching explorador data:', err);
+        const errorMsg = err.response?.data?.error || err.message || 'Error desconocido';
+        setError(`Error al explorar datos: ${errorMsg}`);
+        console.error('❌ Error fetching explorador data:', err);
+        setData(null);
       } finally {
         setLoading(false);
       }
@@ -118,6 +129,12 @@ function ExploradorDatos({ region }) {
   useEffect(() => {
     // Solo cargar si estamos en el dataset de cosechas
     if (tipoDato !== 'cosecha') {
+      setDataCosechas({
+        agentDistribution: null,
+        topPorts: null,
+        speciesBreakdown: null,
+        seasonalContext: null
+      });
       return;
     }
 
@@ -129,21 +146,41 @@ function ExploradorDatos({ region }) {
         const regionFilter = region !== 'TODAS' ? region : null;
 
         // Llamadas paralelas a todas las APIs del módulo de Cosechas
-        const [agentDist, ports, speciesBreak, seasonal] = await Promise.all([
-          getAgentDistribution(year, regionFilter),
-          getTopPorts(year, regionFilter, 5),
-          getSpeciesByAgentBreakdown(year, regionFilter, 10),
-          getSeasonalContext(year || 2024, regionFilter)
+        // Cada llamada tiene su propio manejo de errores para no romper todo
+        const [agentDist, ports, speciesBreak, seasonal] = await Promise.allSettled([
+          getAgentDistribution(year, regionFilter).catch(err => {
+            console.error('Error en getAgentDistribution:', err);
+            return null;
+          }),
+          getTopPorts(year, regionFilter, 5).catch(err => {
+            console.error('Error en getTopPorts:', err);
+            return null;
+          }),
+          getSpeciesByAgentBreakdown(year, regionFilter, 10).catch(err => {
+            console.error('Error en getSpeciesByAgentBreakdown:', err);
+            return null;
+          }),
+          getSeasonalContext(year || 2024, regionFilter).catch(err => {
+            console.error('Error en getSeasonalContext:', err);
+            return null;
+          })
         ]);
 
         setDataCosechas({
-          agentDistribution: agentDist,
-          topPorts: ports,
-          speciesBreakdown: speciesBreak,
-          seasonalContext: seasonal
+          agentDistribution: agentDist.status === 'fulfilled' ? agentDist.value : null,
+          topPorts: ports.status === 'fulfilled' ? ports.value : null,
+          speciesBreakdown: speciesBreak.status === 'fulfilled' ? speciesBreak.value : null,
+          seasonalContext: seasonal.status === 'fulfilled' ? seasonal.value : null
         });
       } catch (err) {
-        console.error('Error fetching cosechas module data:', err);
+        console.error('Error general fetching cosechas module data:', err);
+        // Asegurar que el estado no quede indefinido
+        setDataCosechas({
+          agentDistribution: null,
+          topPorts: null,
+          speciesBreakdown: null,
+          seasonalContext: null
+        });
       } finally {
         setLoadingCosechas(false);
       }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PanoramaRegional from './components/PanoramaRegional';
 import ExploradorDatos from './components/ExploradorDatos';
+import DashboardPlanta from './components/DashboardPlanta';
 import './App.css';
 
 function App() {
@@ -8,7 +9,7 @@ function App() {
   const [regionSeleccionada, setRegionSeleccionada] = useState('LAGOS');
   
   // Estado para cambiar entre vistas
-  const [vistaActual, setVistaActual] = useState('panorama'); // 'panorama' o 'explorador'
+  const [vistaActual, setVistaActual] = useState('panorama'); // 'panorama', 'explorador' o 'planta'
 
   return (
     <div className="app">
@@ -49,6 +50,26 @@ function App() {
           onClick={() => setVistaActual('explorador')}
         >
           🔍 Explorador de Datos
+        </button>
+        <button 
+          className={`nav-button ${vistaActual === 'planta' ? 'active' : ''}`}
+          onClick={() => setVistaActual('planta')}
+        >
+          🏭 Dashboard por Planta
+        </button>
+      </nav>
+
+      {/* Contenido principal */}
+      <main className="main-content">
+        {vistaActual === 'panorama' && (
+          <PanoramaRegional region={regionSeleccionada} />
+        )}
+        {vistaActual === 'explorador' && (
+          <ExploradorDatos region={regionSeleccionada} />
+        )}
+        {vistaActual === 'planta' && (
+          <DashboardPlanta region={regionSeleccionada} />
+        )}
         </button>
       </nav>
 

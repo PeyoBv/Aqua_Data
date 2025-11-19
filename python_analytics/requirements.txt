@@ -1,0 +1,25 @@
+# Python Analytics - Requerimientos
+
+# Core Data Science
+pandas>=2.0.0
+numpy>=1.24.0
+
+# API Framework (opcional - para integración web)
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+pydantic>=2.0.0
+
+# Exportación y serialización
+python-dateutil>=2.8.2
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Visualización (opcional - para gráficos futuros)
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.15.0
+
+# Utilidades
+python-dotenv>=1.0.0

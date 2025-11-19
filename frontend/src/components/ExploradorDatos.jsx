@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import KPICard from './KPICard';
 import LineChart from './LineChart';
 import BarChart from './BarChart';
-import { explorarDatos } from '../services/api';
+import { explorarDatos, obtenerOpcionesDisponibles } from '../services/api';
 
 /**
  * Vista 2: Explorador de Datos - Análisis Detallado
@@ -28,6 +28,26 @@ function ExploradorDatos({ region }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Cargar opciones disponibles al inicio
+  useEffect(() => {
+    const fetchOpciones = async () => {
+      try {
+        const response = await obtenerOpcionesDisponibles();
+        if (response.success && response.opciones) {
+          setOpcionesDisponibles({
+            años: response.opciones.años_disponibles || [],
+            especies: response.opciones.especies_disponibles || [],
+            tiposElaboracion: response.opciones.tipos_elaboracion || []
+          });
+        }
+      } catch (err) {
+        console.error('Error cargando opciones:', err);
+      }
+    };
+    
+    fetchOpciones();
+  }, []);
+
   // Cargar datos cuando cambien los filtros
   useEffect(() => {
     const fetchData = async () => {
@@ -49,15 +69,6 @@ function ExploradorDatos({ region }) {
 
         const response = await explorarDatos(params);
         setData(response);
-        
-        // Actualizar opciones disponibles desde metadata
-        if (response.metadata) {
-          setOpcionesDisponibles({
-            años: response.metadata.años_disponibles || [],
-            especies: response.metadata.especies_disponibles || [],
-            tiposElaboracion: response.metadata.tipos_elaboracion || []
-          });
-        }
       } catch (err) {
         setError('Error al explorar datos. Por favor, intenta nuevamente.');
         console.error('Error fetching explorador data:', err);

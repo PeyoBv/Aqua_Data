@@ -14,6 +14,12 @@ const ExploradorController = require('../controllers/exploradorController');
 router.get('/general', GeneralController.getPanoramaGeneral);
 
 /**
+ * GET /api/v1/explorador/opciones-disponibles
+ * Obtiene las opciones disponibles para filtros (años, especies, tipos, plantas)
+ */
+router.get('/explorador/opciones-disponibles', ExploradorController.obtenerOpcionesDisponibles);
+
+/**
  * GET /api/v1/explorador
  * Endpoint dinámico para explorar diferentes datasets
  * 

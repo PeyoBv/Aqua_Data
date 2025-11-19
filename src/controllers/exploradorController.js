@@ -42,6 +42,29 @@ class ExploradorController {
       });
     }
   }
+
+  /**
+   * GET /api/v1/explorador/opciones-disponibles
+   * Obtiene las opciones disponibles para los filtros (años, especies, tipos, plantas)
+   */
+  static async obtenerOpcionesDisponibles(req, res) {
+    try {
+      const opciones = ExploradorService.obtenerOpcionesDisponibles();
+      
+      res.json({
+        success: true,
+        opciones
+      });
+
+    } catch (error) {
+      console.error('Error en obtenerOpcionesDisponibles:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Error interno del servidor',
+        message: error.message
+      });
+    }
+  }
 }
 
 module.exports = ExploradorController;

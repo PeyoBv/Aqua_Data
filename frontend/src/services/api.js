@@ -54,4 +54,18 @@ export async function explorarDatos(params = {}) {
   }
 }
 
+/**
+ * Obtiene opciones disponibles para filtros (años, especies, tipos, plantas)
+ * @returns {Promise} Promesa con las opciones disponibles
+ */
+export async function obtenerOpcionesDisponibles() {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/explorador/opciones-disponibles`);
+    return response.data;
+  } catch (error) {
+    console.error('Error obteniendo opciones disponibles:', error);
+    throw error;
+  }
+}
+
 export default cosechasAPI;

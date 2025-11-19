@@ -129,9 +129,6 @@ function ExploradorDatos({ region }) {
         const regionFilter = region !== 'TODAS' ? region : null;
 
         // Llamadas paralelas a todas las APIs del módulo de Cosechas
-        // NOTA: Estos endpoints aún no están implementados en el backend
-        // Por ahora se comentan para no romper la aplicación
-        /* 
         const [agentDist, ports, speciesBreak, seasonal] = await Promise.all([
           getAgentDistribution(year, regionFilter),
           getTopPorts(year, regionFilter, 5),
@@ -144,15 +141,6 @@ function ExploradorDatos({ region }) {
           topPorts: ports,
           speciesBreakdown: speciesBreak,
           seasonalContext: seasonal
-        });
-        */
-        
-        // Datos mock temporales para desarrollo
-        setDataCosechas({
-          agentDistribution: null,
-          topPorts: null,
-          speciesBreakdown: null,
-          seasonalContext: null
         });
       } catch (err) {
         console.error('Error fetching cosechas module data:', err);
@@ -424,8 +412,6 @@ function ExploradorDatos({ region }) {
           </div>
 
           {/* NUEVAS GRÁFICAS DEL MÓDULO DE COSECHAS */}
-          {/* NOTA: Sección comentada temporalmente hasta implementar endpoints en backend */}
-          {/*
           {tipoDato === 'cosecha' && !loadingCosechas && dataCosechas && (
             <div className="cosechas-module-section">
               <h3 className="module-title">📊 Análisis Avanzado de Cosechas</h3>
@@ -484,7 +470,6 @@ function ExploradorDatos({ region }) {
               </div>
             </div>
           )}
-          */}
 
           {/* Gráficos */}
           <div className="charts-section">

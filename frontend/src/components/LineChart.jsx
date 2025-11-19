@@ -26,29 +26,72 @@ ChartJS.register(
 );
 
 /**
- * Componente de gráfico de líneas para tendencia mensual
+ * Componente de gráfico de líneas flexible
+ * Soporta modo simple (tendencia mensual) y multi-series (múltiples líneas)
  */
-const LineChart = ({ data, title = 'Tendencia Mensual' }) => {
+const LineChart = ({ 
+  data, 
+  title = 'Tendencia Mensual',
+  multiSeries = false,
+  series = [],
+  xKey = 'mes',
+  yKey = 'toneladas'
+}) => {
   const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
   
-  const chartData = {
-    labels: data.map(item => meses[parseInt(item.mes) - 1] || `Mes ${item.mes}`),
-    datasets: [
-      {
-        label: 'Toneladas',
-        data: data.map(item => item.toneladas),
-        borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+  // Generar etiquetas según el tipo de datos
+  const generateLabels = () => {
+    if (xKey === 'mes') {
+      return data.map(item => meses[parseInt(item.mes) - 1] || `Mes ${item.mes}`);
+    } else if (xKey === 'año') {
+      return data.map(item => item.año?.toString() || '');
+    } else {
+      return data.map(item => item[xKey]?.toString() || '');
+    }
+  };
+
+  // Generar datasets según modo simple o multi-series
+  const generateDatasets = () => {
+    if (multiSeries && series.length > 0) {
+      // Modo multi-series: crear un dataset por cada serie
+      return series.map(serie => ({
+        label: serie.label,
+        data: data.map(item => item[serie.key] || 0),
+        borderColor: serie.color,
+        backgroundColor: `${serie.color}20`, // Color con transparencia
         borderWidth: 2,
         fill: true,
         tension: 0.4,
         pointRadius: 4,
         pointHoverRadius: 6,
-        pointBackgroundColor: '#3b82f6',
+        pointBackgroundColor: serie.color,
         pointBorderColor: '#fff',
         pointBorderWidth: 2
-      }
-    ]
+      }));
+    } else {
+      // Modo simple: una sola línea
+      return [
+        {
+          label: 'Toneladas',
+          data: data.map(item => item[yKey] || 0),
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#3b82f6',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2
+        }
+      ];
+    }
+  };
+
+  const chartData = {
+    labels: generateLabels(),
+    datasets: generateDatasets()
   };
 
   const options = {
@@ -56,7 +99,15 @@ const LineChart = ({ data, title = 'Tendencia Mensual' }) => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false
+        display: multiSeries, // Mostrar leyenda solo en modo multi-series
+        position: 'top',
+        labels: {
+          usePointStyle: true,
+          padding: 15,
+          font: {
+            size: 12
+          }
+        }
       },
       title: {
         display: false
@@ -72,7 +123,8 @@ const LineChart = ({ data, title = 'Tendencia Mensual' }) => {
         },
         callbacks: {
           label: function(context) {
-            return `${context.parsed.y.toLocaleString('es-CL')} toneladas`;
+            const value = context.parsed.y.toLocaleString('es-CL');
+            return `${context.dataset.label}: ${value}`;
           }
         }
       }

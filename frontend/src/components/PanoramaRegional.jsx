@@ -115,6 +115,7 @@ function PanoramaRegional({ region }) {
               data={data.grafico_anual}
               title="Comparativa por Año"
               multiSeries={true}
+              xKey="año"
               series={[
                 {
                   key: 'cosechaTotal',

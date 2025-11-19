@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 const routes = require('./src/routes');
 const DataLoaderService = require('./src/services/dataLoaderService');
 const dataStore = require('./src/data/dataStore');
@@ -15,16 +16,28 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rutas principales
-app.get('/', (req, res) => {
-  res.json({ 
-    message: 'Servidor Express funcionando correctamente',
-    version: '1.0.0'
-  });
-});
-
-// API Routes
+// API Routes (antes de servir archivos estáticos)
 app.use('/api', routes);
+
+// Servir archivos estáticos del frontend en producción
+if (process.env.NODE_ENV === 'production') {
+  const frontendPath = path.join(__dirname, 'frontend', 'dist');
+  app.use(express.static(frontendPath));
+  
+  // Todas las rutas no-API sirven el index.html (para React Router)
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  });
+} else {
+  // En desarrollo, solo mostrar mensaje en la raíz
+  app.get('/', (req, res) => {
+    res.json({ 
+      message: 'Servidor Express funcionando correctamente',
+      version: '1.0.0',
+      mode: 'development'
+    });
+  });
+}
 
 // Puerto del servidor
 const PORT = process.env.PORT || 3000;

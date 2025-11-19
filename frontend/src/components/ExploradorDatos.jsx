@@ -2,7 +2,18 @@ import React, { useState, useEffect } from 'react';
 import KPICard from './KPICard';
 import LineChart from './LineChart';
 import BarChart from './BarChart';
-import { explorarDatos, obtenerOpcionesDisponibles } from '../services/api';
+import DonutChart from './DonutChart';
+import HorizontalBarChart from './HorizontalBarChart';
+import StackedBarChart from './StackedBarChart';
+import MultiLineChart from './MultiLineChart';
+import { 
+  explorarDatos, 
+  obtenerOpcionesDisponibles,
+  getAgentDistribution,
+  getTopPorts,
+  getSpeciesByAgentBreakdown,
+  getSeasonalContext
+} from '../services/api';
 
 /**
  * Vista 2: Explorador de Datos - Análisis Detallado
@@ -14,19 +25,30 @@ function ExploradorDatos({ region }) {
     anio: '',
     mes: '',
     especie: '',
-    tipo_elaboracion: ''
+    tipo_elaboracion: '',
+    tipo_agente: '' // Nuevo filtro para módulo de Cosechas
   });
   
   // Opciones disponibles para los selectores
   const [opcionesDisponibles, setOpcionesDisponibles] = useState({
     años: [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010], // Valores por defecto
     especies: ['SALMON DEL ATLANTICO', 'JUREL', 'MERLUZA COMUN', 'SARDINA ESPAÑOLA', 'ANCHOVETA', 'CONGRIO DORADO', 'JIBIA', 'REINETA', 'BLANQUILLO', 'PEJERREY'], // Valores por defecto
-    tiposElaboracion: ['CONGELADO', 'FRESCO', 'CONSERVA', 'REDUCCION']
+    tiposElaboracion: ['CONGELADO', 'FRESCO', 'CONSERVA', 'REDUCCION'],
+    tiposAgente: ['Industrial', 'Artesanal'] // Nuevo
   });
   
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Estados para datos del módulo de Cosechas
+  const [dataCosechas, setDataCosechas] = useState({
+    agentDistribution: null,
+    topPorts: null,
+    speciesBreakdown: null,
+    seasonalContext: null
+  });
+  const [loadingCosechas, setLoadingCosechas] = useState(false);
 
   // Cargar opciones disponibles al inicio
   useEffect(() => {
@@ -91,6 +113,44 @@ function ExploradorDatos({ region }) {
 
     fetchData();
   }, [tipoDato, region, filtrosEspecificos]);
+
+  // Cargar datos específicos del módulo de Cosechas
+  useEffect(() => {
+    // Solo cargar si estamos en el dataset de cosechas
+    if (tipoDato !== 'cosecha') {
+      return;
+    }
+
+    const fetchCosechasData = async () => {
+      setLoadingCosechas(true);
+      
+      try {
+        const year = filtrosEspecificos.anio || null;
+        const regionFilter = region !== 'TODAS' ? region : null;
+
+        // Llamadas paralelas a todas las APIs del módulo de Cosechas
+        const [agentDist, ports, speciesBreak, seasonal] = await Promise.all([
+          getAgentDistribution(year, regionFilter),
+          getTopPorts(year, regionFilter, 5),
+          getSpeciesByAgentBreakdown(year, regionFilter, 10),
+          getSeasonalContext(year || 2024, regionFilter)
+        ]);
+
+        setDataCosechas({
+          agentDistribution: agentDist,
+          topPorts: ports,
+          speciesBreakdown: speciesBreak,
+          seasonalContext: seasonal
+        });
+      } catch (err) {
+        console.error('Error fetching cosechas module data:', err);
+      } finally {
+        setLoadingCosechas(false);
+      }
+    };
+
+    fetchCosechasData();
+  }, [tipoDato, region, filtrosEspecificos.anio]);
 
   // Manejar cambio de filtros
   const handleFiltroChange = (campo, valor) => {
@@ -231,6 +291,28 @@ function ExploradorDatos({ region }) {
             </select>
           </div>
 
+          {/* Tipo de Agente (solo para Cosechas) */}
+          {tipoDato === 'cosecha' && (
+            <div className="filtro-item">
+              <label htmlFor="filtro-agente">Tipo de Agente:</label>
+              <select
+                id="filtro-agente"
+                value={filtrosEspecificos.tipo_agente || ''}
+                onChange={(e) => {
+                  const valor = e.target.value;
+                  console.log('👥 Tipo de agente seleccionado:', valor);
+                  handleFiltroChange('tipo_agente', valor);
+                }}
+                className="filtro-select"
+              >
+                <option value="">Todos</option>
+                {opcionesDisponibles.tiposAgente.map(tipo => (
+                  <option key={tipo} value={tipo}>{tipo}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {/* Tipo de Elaboración (solo para Producción) */}
           {tipoDato === 'produccion' && (
             <div className="filtro-item">
@@ -328,6 +410,69 @@ function ExploradorDatos({ region }) {
               )}
             </div>
           </div>
+
+          {/* NUEVAS GRÁFICAS DEL MÓDULO DE COSECHAS */}
+          {tipoDato === 'cosecha' && !loadingCosechas && dataCosechas && (
+            <div className="cosechas-module-section">
+              <h3 className="module-title">📊 Análisis Avanzado de Cosechas</h3>
+              
+              {/* Fila 1: Distribución por Agente y Top Puertos */}
+              <div className="charts-row">
+                <div className="chart-container chart-half">
+                  <DonutChart
+                    data={dataCosechas.agentDistribution?.data || []}
+                    title="Distribución por Agente"
+                  />
+                </div>
+                <div className="chart-container chart-half">
+                  <HorizontalBarChart
+                    data={dataCosechas.topPorts?.data || []}
+                    title="Top 5 Puertos con Mayor Desembarque"
+                    dataKey="puerto"
+                    valueKey="toneladas"
+                  />
+                </div>
+              </div>
+
+              {/* Fila 2: Especies por Agente (Stacked Bar) */}
+              <div className="chart-container chart-full">
+                {dataCosechas.speciesBreakdown?.data && dataCosechas.speciesBreakdown.data.length > 0 && (
+                  <StackedBarChart
+                    data={dataCosechas.speciesBreakdown.data}
+                    title="Top 10 Especies - Desglose por Tipo de Agente"
+                    agentTypes={dataCosechas.speciesBreakdown.summary?.tipos_agente || ['Industrial', 'Artesanal']}
+                  />
+                )}
+              </div>
+
+              {/* Fila 3: Comparación Estacional */}
+              <div className="chart-container chart-full">
+                {dataCosechas.seasonalContext?.data && dataCosechas.seasonalContext.data.length > 0 && (
+                  <MultiLineChart
+                    data={dataCosechas.seasonalContext.data}
+                    title={`Comparación Estacional: ${filtrosEspecificos.anio || '2024'} vs Promedio Histórico`}
+                    lines={[
+                      { 
+                        dataKey: 'actual', 
+                        name: `Año ${filtrosEspecificos.anio || '2024'}`, 
+                        color: '#ef4444', 
+                        strokeWidth: 3,
+                        dotSize: 5
+                      },
+                      { 
+                        dataKey: 'historico', 
+                        name: 'Promedio Histórico', 
+                        color: '#94a3b8', 
+                        strokeWidth: 2,
+                        dashed: true,
+                        dotSize: 3
+                      }
+                    ]}
+                  />
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Gráficos */}
           <div className="charts-section">

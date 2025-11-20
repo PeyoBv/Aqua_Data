@@ -9,7 +9,7 @@ function App() {
   const [regionSeleccionada, setRegionSeleccionada] = useState('LAGOS');
   
   // Estado para cambiar entre vistas
-  const [vistaActual, setVistaActual] = useState('panorama'); // 'panorama', 'explorador' o 'comparador'
+  const [vistaActual, setVistaActual] = useState('panorama'); // 'panorama', 'explorador', 'comparador'
 
   return (
     <div className="app">

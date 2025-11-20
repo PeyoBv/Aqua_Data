@@ -2,6 +2,38 @@ import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
+// Log para debugging
+console.log('🔧 API_BASE_URL:', API_BASE_URL);
+console.log('🔧 VITE_API_URL:', import.meta.env.VITE_API_URL);
+console.log('🔧 MODE:', import.meta.env.MODE);
+
+// Interceptor de Axios para logging
+axios.interceptors.request.use(
+  config => {
+    console.log('📤 Request:', config.method?.toUpperCase(), config.url, config.params);
+    return config;
+  },
+  error => {
+    console.error('❌ Request Error:', error);
+    return Promise.reject(error);
+  }
+);
+
+axios.interceptors.response.use(
+  response => {
+    console.log('📥 Response:', response.status, response.config.url);
+    return response;
+  },
+  error => {
+    console.error('❌ Response Error:', error.message, error.config?.url);
+    if (error.response) {
+      console.error('   Status:', error.response.status);
+      console.error('   Data:', error.response.data);
+    }
+    return Promise.reject(error);
+  }
+);
+
 /**
  * Servicio para consumir la API de cosechas (legacy)
  */
@@ -151,6 +183,77 @@ export async function getSeasonalContext(currentYear = 2023, region = null) {
     return response.data;
   } catch (error) {
     console.error('Error fetching seasonal context:', error);
+    throw error;
+  }
+}
+
+/**
+ * ============================================================================
+ * MÓDULO DE PRODUCCIÓN - APIs para Dashboard de Materia Prima
+ * ============================================================================
+ */
+
+/**
+ * Obtiene estadísticas generales de producción (KPIs)
+ * @param {Object} filtros - Filtros opcionales { region, anio, especie, linea_elaboracion }
+ * @returns {Promise} Promesa con estadísticas para KPI Cards
+ */
+export async function getEstadisticasProduccion(filtros = {}) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/produccion/estadisticas`, { 
+      params: filtros 
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching estadísticas producción:', error);
+    throw error;
+  }
+}
+
+/**
+ * Obtiene balance de masas por año (Materia Prima vs Producción)
+ * @param {Object} filtros - Filtros opcionales { region, especie, linea_elaboracion }
+ * @returns {Promise} Promesa con datos para Grouped Bar Chart
+ */
+export async function getBalanceMasas(filtros = {}) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/produccion/balance-masas`, { 
+      params: filtros 
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching balance de masas:', error);
+    throw error;
+  }
+}
+
+/**
+ * Obtiene perfil industrial (distribución por línea de elaboración)
+ * @param {Object} filtros - Filtros opcionales { region, anio, especie }
+ * @returns {Promise} Promesa con datos para Donut Chart
+ */
+export async function getPerfilIndustrial(filtros = {}) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/produccion/perfil-industrial`, { 
+      params: filtros 
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching perfil industrial:', error);
+    throw error;
+  }
+}
+
+/**
+ * Obtiene opciones disponibles para filtros de producción
+ * @returns {Promise} Promesa con opciones para selectores
+ */
+export async function getOpcionesProduccion() {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/produccion/opciones`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching opciones producción:', error);
     throw error;
   }
 }

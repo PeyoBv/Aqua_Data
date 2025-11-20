@@ -19,13 +19,35 @@ function DonutChart({ data, title }) {
     );
   }
 
+  // Calcular porcentajes
+  const total = data.reduce((sum, item) => sum + (item.value || item.toneladas || 0), 0);
+  const dataWithPercentage = data.map(item => ({
+    ...item,
+    porcentaje: total > 0 ? ((item.value || item.toneladas || 0) / total * 100).toFixed(1) : 0
+  }));
+
+  // Generar colores dinámicamente
+  const generateColor = (index) => {
+    const colors = [
+      '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+      '#ec4899', '#14b8a6', '#f97316', '#06b6d4', '#84cc16',
+      '#6366f1', '#d946ef', '#0ea5e9', '#f43f5e', '#22c55e',
+      '#a855f7'
+    ];
+    return colors[index % colors.length];
+  };
+
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
+      const value = payload[0].value || 0;
+      const name = payload[0].name || 'Sin nombre';
+      const porcentaje = payload[0].payload.porcentaje || 0;
+      
       return (
         <div className="custom-tooltip">
-          <p className="tooltip-label">{payload[0].name}</p>
+          <p className="tooltip-label">{name}</p>
           <p className="tooltip-value">
-            {payload[0].value.toLocaleString()} ton ({payload[0].payload.porcentaje}%)
+            {value.toLocaleString('es-CL')} ton ({porcentaje}%)
           </p>
         </div>
       );
@@ -36,32 +58,32 @@ function DonutChart({ data, title }) {
   return (
     <div className="donut-chart-container">
       {title && <h4 className="chart-title">{title}</h4>}
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={400}>
         <PieChart>
           <Pie
-            data={data}
+            data={dataWithPercentage}
             cx="50%"
             cy="50%"
-            innerRadius={60}
-            outerRadius={100}
+            innerRadius={70}
+            outerRadius={120}
             fill="#8884d8"
-            paddingAngle={5}
-            dataKey="toneladas"
-            nameKey="tipo_agente"
+            paddingAngle={2}
+            dataKey="value"
+            nameKey="name"
             label={({ porcentaje }) => `${porcentaje}%`}
           >
-            {data.map((entry, index) => (
+            {dataWithPercentage.map((entry, index) => (
               <Cell 
                 key={`cell-${index}`} 
-                fill={COLORS[entry.tipo_agente] || COLORS['Otro']} 
+                fill={generateColor(index)} 
               />
             ))}
           </Pie>
           <Tooltip content={<CustomTooltip />} />
           <Legend 
             verticalAlign="bottom" 
-            height={36}
-            formatter={(value, entry) => `${value} (${entry.payload.porcentaje}%)`}
+            height={60}
+            formatter={(value, entry) => `${value}`}
           />
         </PieChart>
       </ResponsiveContainer>

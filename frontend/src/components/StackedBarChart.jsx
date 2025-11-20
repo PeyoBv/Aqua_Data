@@ -3,11 +3,13 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import './StackedBarChart.css';
 
 const AGENT_COLORS = {
-  'Industrial': '#2563eb',
-  'Artesanal': '#16a34a',
-  'INDUSTRIAL': '#2563eb',
-  'ARTESANAL': '#16a34a',
-  'Otro': '#d97706'
+  'ACUICULTURA': '#f97316',  // Naranja
+  'ARTESANAL': '#10b981',     // Verde
+  'FABRICA': '#f59e0b',       // Amarillo/Naranja
+  'INDUSTRIAL': '#3b82f6',    // Azul
+  'Industrial': '#3b82f6',
+  'Artesanal': '#10b981',
+  'Otro': '#94a3b8'           // Gris
 };
 
 function StackedBarChart({ data, title, agentTypes = [] }) {
@@ -40,23 +42,24 @@ function StackedBarChart({ data, title, agentTypes = [] }) {
   return (
     <div className="stacked-bar-chart-container">
       {title && <h4 className="chart-title">{title}</h4>}
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={500}>
         <BarChart
           data={data}
-          margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+          layout="vertical"
+          margin={{ top: 20, right: 50, left: 200, bottom: 20 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
           <XAxis 
-            dataKey="especie" 
-            angle={-45}
-            textAnchor="end"
-            height={100}
-            interval={0}
-            tick={{ fontSize: 11 }}
+            type="number"
+            tickFormatter={(value) => value.toLocaleString()}
+            label={{ value: 'Toneladas', position: 'insideBottom', offset: -10 }}
           />
           <YAxis 
-            tickFormatter={(value) => value.toLocaleString()}
-            label={{ value: 'Toneladas', angle: -90, position: 'insideLeft' }}
+            type="category"
+            dataKey="especie"
+            width={180}
+            tick={{ fontSize: 12 }}
+            interval={0}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend 

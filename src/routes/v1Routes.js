@@ -4,6 +4,7 @@ const CosechaController = require('../controllers/cosechaController');
 const GeneralController = require('../controllers/generalController');
 const ExploradorController = require('../controllers/exploradorController');
 const CosechasModuleController = require('../controllers/cosechasModuleController');
+const ProduccionController = require('../controllers/produccionController');
 
 /**
  * GET /api/v1/general
@@ -91,5 +92,49 @@ router.get('/cosechas/species-breakdown', CosechasModuleController.getSpeciesByA
  * - region: Región específica
  */
 router.get('/cosechas/seasonal-context', CosechasModuleController.getSeasonalContext);
+
+// ======================================================
+// MÓDULO DE PRODUCCIÓN - Dashboard de Materia Prima
+// ======================================================
+
+/**
+ * GET /api/v1/produccion/estadisticas
+ * KPIs generales de producción: Total MP, Producción, Especies, Rendimiento
+ * 
+ * Query params opcionales:
+ * - region: Región específica
+ * - anio: Año específico
+ * - especie: Especie específica
+ * - linea_elaboracion: Línea de elaboración
+ */
+router.get('/produccion/estadisticas', ProduccionController.getEstadisticas);
+
+/**
+ * GET /api/v1/produccion/balance-masas
+ * Balance de Masas por Año (Materia Prima vs Producción)
+ * 
+ * Query params opcionales:
+ * - region: Región específica
+ * - especie: Especie específica
+ * - linea_elaboracion: Línea de elaboración
+ */
+router.get('/produccion/balance-masas', ProduccionController.getBalanceMasas);
+
+/**
+ * GET /api/v1/produccion/perfil-industrial
+ * Perfil Industrial: Distribución por Línea de Elaboración
+ * 
+ * Query params opcionales:
+ * - region: Región específica
+ * - anio: Año específico
+ * - especie: Especie específica
+ */
+router.get('/produccion/perfil-industrial', ProduccionController.getPerfilIndustrial);
+
+/**
+ * GET /api/v1/produccion/opciones
+ * Obtiene opciones disponibles para filtros de producción
+ */
+router.get('/produccion/opciones', ProduccionController.getOpciones);
 
 module.exports = router;

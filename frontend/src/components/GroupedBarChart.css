@@ -1,0 +1,57 @@
+.grouped-bar-chart {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+.grouped-bar-chart h3 {
+  margin: 0 0 20px 0;
+  color: #1f2937;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.grouped-bar-chart.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.grouped-bar-chart .no-data-message {
+  color: #9ca3af;
+  font-size: 16px;
+  margin-top: 12px;
+}
+
+.grouped-bar-chart .custom-tooltip {
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.grouped-bar-chart .custom-tooltip .label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1f2937;
+  font-size: 14px;
+}
+
+.grouped-bar-chart .custom-tooltip p {
+  margin: 4px 0;
+  font-size: 13px;
+}
+
+.grouped-bar-chart .custom-tooltip .efficiency {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+  color: #6b7280;
+  font-weight: 500;
+  font-style: italic;
+}

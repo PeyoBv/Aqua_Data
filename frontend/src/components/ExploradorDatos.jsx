@@ -6,13 +6,18 @@ import DonutChart from './DonutChart';
 import HorizontalBarChart from './HorizontalBarChart';
 import StackedBarChart from './StackedBarChart';
 import MultiLineChart from './MultiLineChart';
+import GroupedBarChart from './GroupedBarChart';
 import { 
   explorarDatos, 
   obtenerOpcionesDisponibles,
   getAgentDistribution,
   getTopPorts,
   getSpeciesByAgentBreakdown,
-  getSeasonalContext
+  getSeasonalContext,
+  getEstadisticasProduccion,
+  getBalanceMasas,
+  getPerfilIndustrial,
+  getOpcionesProduccion
 } from '../services/api';
 
 /**
@@ -34,7 +39,7 @@ function ExploradorDatos({ region }) {
     años: [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010], // Valores por defecto
     especies: ['SALMON DEL ATLANTICO', 'JUREL', 'MERLUZA COMUN', 'SARDINA ESPAÑOLA', 'ANCHOVETA', 'CONGRIO DORADO', 'JIBIA', 'REINETA', 'BLANQUILLO', 'PEJERREY'], // Valores por defecto
     tiposElaboracion: ['CONGELADO', 'FRESCO', 'CONSERVA', 'REDUCCION'],
-    tiposAgente: ['Industrial', 'Artesanal'] // Nuevo
+    tiposAgente: ['ACUICULTURA', 'ARTESANAL', 'FABRICA', 'INDUSTRIAL'] // Tipos de agente disponibles
   });
   
   const [data, setData] = useState(null);
@@ -49,6 +54,14 @@ function ExploradorDatos({ region }) {
     seasonalContext: null
   });
   const [loadingCosechas, setLoadingCosechas] = useState(false);
+
+  // Estados para datos del módulo de Producción
+  const [dataProduccion, setDataProduccion] = useState({
+    estadisticas: null,
+    balanceMasas: null,
+    perfilIndustrial: null
+  });
+  const [loadingProduccion, setLoadingProduccion] = useState(false);
 
   // Cargar opciones disponibles al inicio
   useEffect(() => {
@@ -104,6 +117,9 @@ function ExploradorDatos({ region }) {
         console.log('🔍 Explorando datos con parámetros:', params);
         const response = await explorarDatos(params);
         console.log('✅ Datos recibidos:', response);
+        console.log('📊 Gráficos en respuesta:', response?.graficos);
+        console.log('📈 porMes:', response?.graficos?.porMes);
+        console.log('🐟 porEspecie:', response?.graficos?.porEspecie);
         
         if (!response || !response.success) {
           console.error('❌ Respuesta inválida del servidor:', response);
@@ -143,38 +159,43 @@ function ExploradorDatos({ region }) {
       
       try {
         const year = filtrosEspecificos.anio || null;
-        const regionFilter = region !== 'TODAS' ? region : null;
+        // NO filtrar por región para el módulo de Cosechas - mostrar todos los datos
+        const regionFilter = null; // Siempre null para mostrar todos los datos
+
+        console.log('🎣 Cargando datos del módulo de Cosechas...', { year, regionOriginal: region });
 
         // Llamadas paralelas a todas las APIs del módulo de Cosechas
-        // Cada llamada tiene su propio manejo de errores para no romper todo
         const [agentDist, ports, speciesBreak, seasonal] = await Promise.allSettled([
-          getAgentDistribution(year, regionFilter).catch(err => {
-            console.error('Error en getAgentDistribution:', err);
-            return null;
-          }),
-          getTopPorts(year, regionFilter, 5).catch(err => {
-            console.error('Error en getTopPorts:', err);
-            return null;
-          }),
-          getSpeciesByAgentBreakdown(year, regionFilter, 10).catch(err => {
-            console.error('Error en getSpeciesByAgentBreakdown:', err);
-            return null;
-          }),
-          getSeasonalContext(year || 2024, regionFilter).catch(err => {
-            console.error('Error en getSeasonalContext:', err);
-            return null;
-          })
+          getAgentDistribution(year, regionFilter),
+          getTopPorts(year, regionFilter, 5),
+          getSpeciesByAgentBreakdown(year, regionFilter, 10),
+          getSeasonalContext(year || 2024, regionFilter)
         ]);
 
-        setDataCosechas({
-          agentDistribution: agentDist.status === 'fulfilled' ? agentDist.value : null,
-          topPorts: ports.status === 'fulfilled' ? ports.value : null,
-          speciesBreakdown: speciesBreak.status === 'fulfilled' ? speciesBreak.value : null,
-          seasonalContext: seasonal.status === 'fulfilled' ? seasonal.value : null
+        console.log('✅ Resultados del módulo de Cosechas:', {
+          agentDist: agentDist.status === 'fulfilled' ? agentDist.value : agentDist.reason,
+          ports: ports.status === 'fulfilled' ? ports.value : ports.reason,
+          speciesBreak: speciesBreak.status === 'fulfilled' ? speciesBreak.value : speciesBreak.reason,
+          seasonal: seasonal.status === 'fulfilled' ? seasonal.value : seasonal.reason
         });
+
+        const cosechasData = {
+          agentDistribution: agentDist.status === 'fulfilled' && agentDist.value?.success ? agentDist.value : null,
+          topPorts: ports.status === 'fulfilled' && ports.value?.success ? ports.value : null,
+          speciesBreakdown: speciesBreak.status === 'fulfilled' && speciesBreak.value?.success ? speciesBreak.value : null,
+          seasonalContext: seasonal.status === 'fulfilled' && seasonal.value?.success ? seasonal.value : null
+        };
+
+        console.log('📊 Data procesada para gráficas:', {
+          agentDistribution: cosechasData.agentDistribution?.data?.length || 0,
+          topPorts: cosechasData.topPorts?.data?.length || 0,
+          speciesBreakdown: cosechasData.speciesBreakdown?.data?.length || 0,
+          seasonalContext: cosechasData.seasonalContext?.data?.length || 0
+        });
+
+        setDataCosechas(cosechasData);
       } catch (err) {
-        console.error('Error general fetching cosechas module data:', err);
-        // Asegurar que el estado no quede indefinido
+        console.error('❌ Error general fetching cosechas module data:', err);
         setDataCosechas({
           agentDistribution: null,
           topPorts: null,
@@ -188,6 +209,72 @@ function ExploradorDatos({ region }) {
 
     fetchCosechasData();
   }, [tipoDato, region, filtrosEspecificos.anio]);
+
+  // Cargar datos específicos del módulo de Producción
+  useEffect(() => {
+    // Solo cargar si estamos en el dataset de producción
+    if (tipoDato !== 'produccion') {
+      setDataProduccion({
+        estadisticas: null,
+        balanceMasas: null,
+        perfilIndustrial: null
+      });
+      return;
+    }
+
+    const fetchProduccionData = async () => {
+      setLoadingProduccion(true);
+      
+      try {
+        // Preparar filtros (NO incluir región para producción ya que usa códigos numéricos)
+        const filtros = {};
+        // No enviar región para producción
+        if (filtrosEspecificos.anio) filtros.anio = filtrosEspecificos.anio;
+        if (filtrosEspecificos.especie) filtros.especie = filtrosEspecificos.especie;
+        if (filtrosEspecificos.tipo_elaboracion) filtros.linea_elaboracion = filtrosEspecificos.tipo_elaboracion;
+
+        console.log('🏭 Cargando datos del módulo de Producción...', filtros);
+
+        // Llamadas paralelas a las APIs del módulo de Producción
+        const [estadisticas, balanceMasas, perfilIndustrial] = await Promise.allSettled([
+          getEstadisticasProduccion(filtros),
+          getBalanceMasas(filtros),
+          getPerfilIndustrial(filtros)
+        ]);
+
+        const produccionData = {
+          estadisticas: estadisticas.status === 'fulfilled' && estadisticas.value?.success ? estadisticas.value.estadisticas : null,
+          balanceMasas: balanceMasas.status === 'fulfilled' && balanceMasas.value?.success ? balanceMasas.value.data : null,
+          perfilIndustrial: perfilIndustrial.status === 'fulfilled' && perfilIndustrial.value?.success ? perfilIndustrial.value.data : null
+        };
+
+        console.log('📊 Data de Producción procesada:', {
+          estadisticas: produccionData.estadisticas ? 'OK' : 'NULL',
+          balanceMasas: produccionData.balanceMasas?.length || 0,
+          perfilIndustrial: produccionData.perfilIndustrial?.length || 0
+        });
+
+        console.log('🔍 Detalles completos:', {
+          estadisticas: produccionData.estadisticas,
+          balanceMasasFirst: produccionData.balanceMasas?.[0],
+          perfilFirst: produccionData.perfilIndustrial?.[0]
+        });
+
+        setDataProduccion(produccionData);
+      } catch (err) {
+        console.error('❌ Error fetching produccion module data:', err);
+        setDataProduccion({
+          estadisticas: null,
+          balanceMasas: null,
+          perfilIndustrial: null
+        });
+      } finally {
+        setLoadingProduccion(false);
+      }
+    };
+
+    fetchProduccionData();
+  }, [tipoDato, region, filtrosEspecificos.anio, filtrosEspecificos.especie, filtrosEspecificos.tipo_elaboracion]);
 
   // Manejar cambio de filtros
   const handleFiltroChange = (campo, valor) => {
@@ -279,30 +366,32 @@ function ExploradorDatos({ region }) {
             </select>
           </div>
 
-          {/* Mes */}
-          <div className="filtro-item">
-            <label htmlFor="filtro-mes">Mes:</label>
-            <select
-              id="filtro-mes"
-              value={filtrosEspecificos.mes || ''}
-              onChange={(e) => handleFiltroChange('mes', e.target.value)}
-              className="filtro-select"
-            >
-              <option value="">Todos</option>
-              <option value="1">Enero</option>
-              <option value="2">Febrero</option>
-              <option value="3">Marzo</option>
-              <option value="4">Abril</option>
-              <option value="5">Mayo</option>
-              <option value="6">Junio</option>
-              <option value="7">Julio</option>
-              <option value="8">Agosto</option>
-              <option value="9">Septiembre</option>
-              <option value="10">Octubre</option>
-              <option value="11">Noviembre</option>
-              <option value="12">Diciembre</option>
-            </select>
-          </div>
+          {/* Mes (solo para Cosechas y Plantas, NO para Producción) */}
+          {tipoDato !== 'produccion' && (
+            <div className="filtro-item">
+              <label htmlFor="filtro-mes">Mes:</label>
+              <select
+                id="filtro-mes"
+                value={filtrosEspecificos.mes || ''}
+                onChange={(e) => handleFiltroChange('mes', e.target.value)}
+                className="filtro-select"
+              >
+                <option value="">Todos</option>
+                <option value="1">Enero</option>
+                <option value="2">Febrero</option>
+                <option value="3">Marzo</option>
+                <option value="4">Abril</option>
+                <option value="5">Mayo</option>
+                <option value="6">Junio</option>
+                <option value="7">Julio</option>
+                <option value="8">Agosto</option>
+                <option value="9">Septiembre</option>
+                <option value="10">Octubre</option>
+                <option value="11">Noviembre</option>
+                <option value="12">Diciembre</option>
+              </select>
+            </div>
+          )}
 
           {/* Especie */}
           <div className="filtro-item">
@@ -343,9 +432,18 @@ function ExploradorDatos({ region }) {
                 className="filtro-select"
               >
                 <option value="">Todos</option>
-                {opcionesDisponibles.tiposAgente.map(tipo => (
-                  <option key={tipo} value={tipo}>{tipo}</option>
-                ))}
+                {opcionesDisponibles?.tiposAgente?.length > 0 ? (
+                  opcionesDisponibles.tiposAgente.map(tipo => (
+                    <option key={tipo} value={tipo}>{tipo}</option>
+                  ))
+                ) : (
+                  <>
+                    <option value="ACUICULTURA">ACUICULTURA</option>
+                    <option value="ARTESANAL">ARTESANAL</option>
+                    <option value="FABRICA">FABRICA</option>
+                    <option value="INDUSTRIAL">INDUSTRIAL</option>
+                  </>
+                )}
               </select>
             </div>
           )}
@@ -421,130 +519,236 @@ function ExploradorDatos({ region }) {
                 <span className="stat-label">Especies</span>
                 <span className="stat-value">{data.estadisticas?.especiesUnicas || 0}</span>
               </div>
-              {tipoDato === 'cosecha' && (
+              {tipoDato === 'cosecha' && data.estadisticas?.toneladasTotales !== undefined && (
                 <div className="stat-card highlight">
                   <span className="stat-label">Toneladas Totales</span>
-                  <span className="stat-value">{data.estadisticas?.toneladasTotales?.toLocaleString() || 0}</span>
+                  <span className="stat-value">{data.estadisticas.toneladasTotales.toLocaleString()}</span>
                 </div>
               )}
               {tipoDato === 'produccion' && (
                 <>
-                  <div className="stat-card highlight">
-                    <span className="stat-label">Ton. Materia Prima</span>
-                    <span className="stat-value">{data.estadisticas?.toneladasMPTotales?.toLocaleString() || 0}</span>
-                  </div>
-                  <div className="stat-card highlight">
-                    <span className="stat-label">Ton. Elaboradas</span>
-                    <span className="stat-value">{data.estadisticas?.toneladasElaboradasTotales?.toLocaleString() || 0}</span>
-                  </div>
+                  {data.estadisticas?.toneladasMPTotales !== undefined && (
+                    <div className="stat-card highlight">
+                      <span className="stat-label">Ton. Materia Prima</span>
+                      <span className="stat-value">{data.estadisticas.toneladasMPTotales.toLocaleString()}</span>
+                    </div>
+                  )}
+                  {data.estadisticas?.toneladasElaboradasTotales !== undefined && (
+                    <div className="stat-card highlight">
+                      <span className="stat-label">Ton. Elaboradas</span>
+                      <span className="stat-value">{data.estadisticas.toneladasElaboradasTotales.toLocaleString()}</span>
+                    </div>
+                  )}
                 </>
               )}
-              {tipoDato === 'plantas' && (
+              {tipoDato === 'plantas' && data.estadisticas?.plantasUnicas !== undefined && (
                 <div className="stat-card highlight">
                   <span className="stat-label">Plantas Únicas</span>
-                  <span className="stat-value">{data.estadisticas?.plantasUnicas || 0}</span>
+                  <span className="stat-value">{data.estadisticas.plantasUnicas}</span>
                 </div>
               )}
             </div>
           </div>
 
           {/* NUEVAS GRÁFICAS DEL MÓDULO DE COSECHAS */}
-          {tipoDato === 'cosecha' && !loadingCosechas && dataCosechas && (
+          {tipoDato === 'cosecha' && (
             <div className="cosechas-module-section">
               <h3 className="module-title">📊 Análisis Avanzado de Cosechas</h3>
               
-              <div className="charts-row">
-                <div className="chart-container chart-half">
-                  <DonutChart
-                    data={dataCosechas.agentDistribution?.data || []}
-                    title="Distribución por Agente"
-                  />
+              {loadingCosechas && (
+                <div className="loading-container">
+                  <div className="spinner"></div>
+                  <p>Cargando análisis avanzado...</p>
                 </div>
-                <div className="chart-container chart-half">
-                  <HorizontalBarChart
-                    data={dataCosechas.topPorts?.data || []}
-                    title="Top 5 Puertos con Mayor Desembarque"
-                    dataKey="puerto"
-                    valueKey="toneladas"
-                  />
-                </div>
-              </div>
+              )}
 
-              <div className="chart-container chart-full">
-                {dataCosechas.speciesBreakdown?.data && dataCosechas.speciesBreakdown.data.length > 0 && (
-                  <StackedBarChart
-                    data={dataCosechas.speciesBreakdown.data}
-                    title="Top 10 Especies - Desglose por Tipo de Agente"
-                    agentTypes={dataCosechas.speciesBreakdown.summary?.tipos_agente || ['Industrial', 'Artesanal']}
-                  />
-                )}
-              </div>
+              {!loadingCosechas && (
+                <>
+                  {/* Fila 1: Distribución por Agente y Top Puertos */}
+                  <div className="charts-row">
+                    {dataCosechas.agentDistribution?.data && dataCosechas.agentDistribution.data.length > 0 ? (
+                      <div className="chart-container chart-half">
+                        <DonutChart
+                          data={dataCosechas.agentDistribution.data}
+                          title="Distribución por Agente"
+                        />
+                      </div>
+                    ) : (
+                      <div className="chart-container chart-half">
+                        <div className="no-data-message">
+                          <p>⚠️ No hay datos de distribución por agente</p>
+                          <small>Intenta cambiar los filtros de año o región</small>
+                        </div>
+                      </div>
+                    )}
 
-              <div className="chart-container chart-full">
-                {dataCosechas.seasonalContext?.data && dataCosechas.seasonalContext.data.length > 0 && (
-                  <MultiLineChart
-                    data={dataCosechas.seasonalContext.data}
-                    title={`Comparación Estacional: ${filtrosEspecificos.anio || '2024'} vs Promedio Histórico`}
-                    lines={[
-                      { 
-                        dataKey: 'actual', 
-                        name: `Año ${filtrosEspecificos.anio || '2024'}`, 
-                        color: '#ef4444', 
-                        strokeWidth: 3,
-                        dotSize: 5
-                      },
-                      { 
-                        dataKey: 'historico', 
-                        name: 'Promedio Histórico', 
-                        color: '#94a3b8', 
-                        strokeWidth: 2,
-                        dashed: true,
-                        dotSize: 3
-                      }
-                    ]}
-                  />
-                )}
-              </div>
+                    {dataCosechas.topPorts?.data && dataCosechas.topPorts.data.length > 0 ? (
+                      <div className="chart-container chart-half">
+                        <HorizontalBarChart
+                          data={dataCosechas.topPorts.data}
+                          title="Top 5 Puertos con Mayor Desembarque"
+                          dataKey="puerto"
+                          valueKey="toneladas"
+                        />
+                      </div>
+                    ) : (
+                      <div className="chart-container chart-half">
+                        <div className="no-data-message">
+                          <p>⚠️ No hay datos de puertos</p>
+                          <small>Intenta cambiar los filtros de año o región</small>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Fila 2: Especies por Agente */}
+                  {dataCosechas.speciesBreakdown?.data && dataCosechas.speciesBreakdown.data.length > 0 ? (
+                    <div className="chart-container chart-full">
+                      <StackedBarChart
+                        data={dataCosechas.speciesBreakdown.data}
+                        title="Top 10 Especies - Desglose por Tipo de Agente"
+                        agentTypes={dataCosechas.speciesBreakdown.summary?.tipos_agente || ['ACUICULTURA', 'ARTESANAL', 'FABRICA', 'INDUSTRIAL']}
+                      />
+                    </div>
+                  ) : (
+                    <div className="chart-container chart-full">
+                      <div className="no-data-message">
+                        <p>⚠️ No hay datos del desglose de especies por agente</p>
+                        <small>Intenta cambiar los filtros de año o región</small>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Fila 3: Comparación Estacional */}
+                  {dataCosechas.seasonalContext?.data && dataCosechas.seasonalContext.data.length > 0 ? (
+                    <div className="chart-container chart-full">
+                      <MultiLineChart
+                        data={dataCosechas.seasonalContext.data}
+                        title={`Comparación Estacional: ${filtrosEspecificos.anio || '2024'} vs Promedio Histórico`}
+                        lines={[
+                          { 
+                            dataKey: 'actual', 
+                            name: `Año ${filtrosEspecificos.anio || '2024'}`, 
+                            color: '#ef4444', 
+                            strokeWidth: 4,
+                            dotSize: 6
+                          },
+                          { 
+                            dataKey: 'historico', 
+                            name: 'Promedio Histórico', 
+                            color: '#94a3b8', 
+                            strokeWidth: 3,
+                            dashed: true,
+                            dotSize: 4
+                          }
+                        ]}
+                      />
+                    </div>
+                  ) : (
+                    <div className="chart-container chart-full">
+                      <div className="no-data-message">
+                        <p>⚠️ No hay datos de comparación estacional</p>
+                        <small>Intenta seleccionar un año específico</small>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           )}
 
-          {/* Gráficos */}
-          <div className="charts-section">
-            {/* Distribución Mensual */}
-            <div className="chart-container chart-full">
-              <h3>📅 Distribución Mensual</h3>
-              {data.graficos?.porMes && data.graficos.porMes.length > 0 ? (
-                <LineChart
-                  data={data.graficos.porMes}
-                  title="Toneladas por Mes"
-                  xKey="mes"
-                  yKey="toneladas"
-                />
-              ) : (
-                <div className="no-data-message">
-                  <p>Sin datos mensuales para mostrar con los filtros aplicados</p>
+          {/* NUEVAS GRÁFICAS DEL MÓDULO DE PRODUCCIÓN */}
+          {tipoDato === 'produccion' && (
+            <div className="produccion-module-section">
+              <h3 className="module-title">🏭 Análisis Avanzado de Producción</h3>
+              
+              {loadingProduccion && (
+                <div className="loading-container">
+                  <div className="spinner"></div>
+                  <p>Cargando análisis de producción...</p>
                 </div>
               )}
-            </div>
 
-            {/* Top Especies */}
-            <div className="chart-container chart-full">
-              <h3>🐟 Top 10 Especies</h3>
-              {data.graficos?.porEspecie && data.graficos.porEspecie.length > 0 ? (
-                <BarChart
-                  data={data.graficos.porEspecie}
-                  title="Especies por Toneladas"
-                  dataKey="especie"
-                  valueKey="toneladas"
-                  limit={10}
-                />
-              ) : (
-                <div className="no-data-message">
-                  <p>Sin datos de especies para mostrar con los filtros aplicados</p>
-                </div>
+              {!loadingProduccion && (
+                <>
+                  {/* KPIs de Producción */}
+                  {dataProduccion.estadisticas && (
+                    <div className="kpis-section">
+                      <h4>📊 Indicadores Clave</h4>
+                      <div className="kpis-grid">
+                        <KPICard
+                          title="Total Materia Prima"
+                          value={`${dataProduccion.estadisticas.totalMateriaPrima?.toLocaleString('es-CL') || '0'} ton`}
+                          icon="📦"
+                          color="#3b82f6"
+                        />
+                        <KPICard
+                          title="Total Producción"
+                          value={`${dataProduccion.estadisticas.totalProduccion?.toLocaleString('es-CL') || '0'} ton`}
+                          icon="🏭"
+                          color="#10b981"
+                        />
+                        <KPICard
+                          title="Especies Procesadas"
+                          value={dataProduccion.estadisticas.especiesUnicas || 0}
+                          icon="🐟"
+                          color="#f59e0b"
+                        />
+                        <KPICard
+                          title="Rendimiento Promedio"
+                          value={`${dataProduccion.estadisticas.rendimientoPromedio?.toFixed(1) || '0.0'}%`}
+                          icon="📈"
+                          color="#8b5cf6"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Balance de Masas */}
+                  {dataProduccion.balanceMasas && dataProduccion.balanceMasas.length > 0 ? (
+                    <div className="chart-container chart-full">
+                      <GroupedBarChart
+                        data={dataProduccion.balanceMasas}
+                        title="Balance de Masas por Año"
+                        bar1Key="materiaPrima"
+                        bar1Name="Materia Prima"
+                        bar1Color="#3b82f6"
+                        bar2Key="produccion"
+                        bar2Name="Producción"
+                        bar2Color="#10b981"
+                        xKey="año"
+                        height={450}
+                      />
+                    </div>
+                  ) : (
+                    <div className="chart-container chart-full">
+                      <div className="no-data-message">
+                        <p>⚠️ No hay datos de balance de masas</p>
+                        <small>Intenta cambiar los filtros</small>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Perfil Industrial */}
+                  {dataProduccion.perfilIndustrial && dataProduccion.perfilIndustrial.length > 0 ? (
+                    <div className="chart-container chart-full">
+                      <DonutChart
+                        data={dataProduccion.perfilIndustrial}
+                        title="Perfil Industrial - Distribución por Línea de Elaboración"
+                      />
+                    </div>
+                  ) : (
+                    <div className="chart-container chart-full">
+                      <div className="no-data-message">
+                        <p>⚠️ No hay datos de perfil industrial</p>
+                        <small>Intenta cambiar los filtros</small>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
-          </div>
+          )}
 
           {/* Filtros Activos */}
           {data.filtros && Object.keys(data.filtros).length > 0 && (

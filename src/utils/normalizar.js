@@ -120,14 +120,9 @@ function parsearDecimal(valor) {
       valorStr = valorStr.replace(/,/g, '');
     }
   } else if (tieneComa) {
-    // Solo tiene coma: puede ser 1234,56 o 1,234 (miles)
-    // Asumimos que es separador decimal si hay 2-3 dígitos después
-    const despuesComa = valorStr.split(',')[1];
-    if (despuesComa && despuesComa.length <= 3) {
-      valorStr = valorStr.replace(',', '.');
-    } else {
-      valorStr = valorStr.replace(/,/g, '');
-    }
+    // Solo tiene coma: reemplazar siempre por punto (formato del CSV chileno)
+    // Ejemplos: "20825,0" -> "20825.0", "5,0" -> "5.0"
+    valorStr = valorStr.replace(',', '.');
   }
   // Si solo tiene punto, dejar como está
 
@@ -225,16 +220,16 @@ function normalizarDesembarque(item) {
 function normalizarMateriaPrima(item) {
   return {
     id: parsearEntero(item.id),
-    año: normalizarAnio(item.año || item.ano || item.anio),
+    año: normalizarAnio(item.año || item.ano || item.anio || item['a�o']),
     region: normalizarTexto(item.region || item.región),
-    cd_planta: parsearEntero(item.cd_planta),
-    planta: normalizarTexto(item.planta),
+    cd_planta: parsearEntero(item.cd_planta || item.cod_planta),
+    planta: normalizarTexto(item.planta || item.nom_planta),
     mes: normalizarMes(item.mes),
-    cd_especie: parsearEntero(item.cd_especie),
-    especie: normalizarTexto(item.especie),
-    tipo_elaboracion: normalizarTexto(item.tipo_elaboracion || item.tipo_elaboración),
-    toneladas_mp: parsearDecimal(item.toneladas_mp),
-    toneladas_elaboradas: parsearDecimal(item.toneladas_elaboradas)
+    cd_especie: parsearEntero(item.cd_especie || item.cod_especie),
+    especie: normalizarTexto(item.especie || item.nom_especie),
+    tipo_elaboracion: normalizarTexto(item.tipo_elaboracion || item.tipo_elaboración || item.nom_linea),
+    toneladas_mp: parsearDecimal(item.toneladas_mp || item.materia_prima),
+    toneladas_elaboradas: parsearDecimal(item.toneladas_elaboradas || item.produccion)
   };
 }
 

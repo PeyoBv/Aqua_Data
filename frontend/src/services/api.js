@@ -258,4 +258,107 @@ export async function getOpcionesProduccion() {
   }
 }
 
+/**
+ * ============================================================================
+ * MÓDULO DE PLANTAS - APIs para Infraestructura Industrial
+ * ============================================================================
+ */
+
+/**
+ * Obtiene estadísticas generales de plantas (KPIs)
+ * @param {Object} filtros - Filtros opcionales { region, anio }
+ * @returns {Promise} Promesa con estadísticas para KPI Cards
+ */
+export async function getEstadisticasPlantas(filtros = {}) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/plantas/estadisticas`, { 
+      params: filtros 
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching estadísticas plantas:', error);
+    throw error;
+  }
+}
+
+/**
+ * Obtiene evolución tecnológica por año (Stacked Bar Chart)
+ * @param {Object} filtros - Filtros opcionales { region }
+ * @returns {Promise} Promesa con datos para Stacked Bar Chart
+ */
+export async function getEvolucionTecnologica(filtros = {}) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/plantas/evolucion-tecnologica`, { 
+      params: filtros 
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching evolución tecnológica:', error);
+    throw error;
+  }
+}
+
+/**
+ * Obtiene distribución de procesos (Treemap / Pie Chart)
+ * @param {Object} filtros - Filtros opcionales { region, anio }
+ * @returns {Promise} Promesa con datos para Treemap Chart
+ */
+export async function getDistribucionProcesos(filtros = {}) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/plantas/distribucion-procesos`, { 
+      params: filtros 
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching distribución procesos:', error);
+    throw error;
+  }
+}
+
+/**
+ * Obtiene top complejos industriales (Bar Chart Horizontal)
+ * @param {Object} filtros - Filtros opcionales { region, anio, top_n }
+ * @returns {Promise} Promesa con datos para Horizontal Bar Chart
+ */
+export async function getTopComplejos(filtros = {}) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/plantas/top-complejos`, { 
+      params: filtros 
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching top complejos:', error);
+    throw error;
+  }
+}
+
+/**
+ * Obtiene opciones disponibles para filtros de plantas
+ * @returns {Promise} Promesa con opciones para selectores
+ */
+export async function getOpcionesPlantas() {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/plantas/opciones`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching opciones plantas:', error);
+    throw error;
+  }
+}
+
+/**
+ * Obtiene la distribución de líneas de producción (tecnología) por año
+ * @param {Object} params - Parámetros de filtro { region, year }
+ * @returns {Promise} Promesa con datos de distribución tecnológica
+ */
+export async function getDistribucionTecnologica(params = {}) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/general/distribucion-tecnologica`, { params });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching distribución tecnológica:', error);
+    throw error;
+  }
+}
+
 export default cosechasAPI;

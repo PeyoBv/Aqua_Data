@@ -1,10 +1,11 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import './HorizontalBarChart.css';
+import './ChartDescription.css';
 
 const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#6366f1', '#ef4444', '#14b8a6', '#f97316', '#84cc16'];
 
-function HorizontalBarChart({ data, title, dataKey = 'puerto', valueKey = 'toneladas' }) {
+function HorizontalBarChart({ data, title, description, dataKey = 'puerto', valueKey = 'toneladas', unit = 'toneladas' }) {
   if (!data || data.length === 0) {
     return (
       <div className="chart-empty">
@@ -19,7 +20,7 @@ function HorizontalBarChart({ data, title, dataKey = 'puerto', valueKey = 'tonel
         <div className="custom-tooltip">
           <p className="tooltip-label">{payload[0].payload[dataKey]}</p>
           <p className="tooltip-value">
-            {payload[0].value.toLocaleString()} toneladas
+            {payload[0].value.toLocaleString()} {unit}
           </p>
           {payload[0].payload.ranking && (
             <p className="tooltip-ranking">Ranking: #{payload[0].payload.ranking}</p>
@@ -33,11 +34,12 @@ function HorizontalBarChart({ data, title, dataKey = 'puerto', valueKey = 'tonel
   return (
     <div className="horizontal-bar-chart-container">
       {title && <h4 className="chart-title">{title}</h4>}
-      <ResponsiveContainer width="100%" height={300}>
+      {description && <p className="chart-description">{description}</p>}
+      <ResponsiveContainer width="100%" height={400}>
         <BarChart
           data={data}
           layout="vertical"
-          margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
+          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
           <XAxis 
@@ -47,8 +49,8 @@ function HorizontalBarChart({ data, title, dataKey = 'puerto', valueKey = 'tonel
           <YAxis 
             type="category" 
             dataKey={dataKey} 
-            width={90}
-            tick={{ fontSize: 12 }}
+            width={100}
+            tick={{ fontSize: 11 }}
           />
           <Tooltip content={<CustomTooltip />} />
           <Bar dataKey={valueKey} radius={[0, 8, 8, 0]}>

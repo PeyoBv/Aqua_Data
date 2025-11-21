@@ -1,8 +1,9 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, ComposedChart } from 'recharts';
 import './MultiLineChart.css';
+import './ChartDescription.css';
 
-function MultiLineChart({ data, title, lines = [] }) {
+function MultiLineChart({ data, title, description, lines = [] }) {
   if (!data || data.length === 0) {
     return (
       <div className="chart-empty">

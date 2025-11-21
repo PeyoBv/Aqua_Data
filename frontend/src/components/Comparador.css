@@ -1,0 +1,307 @@
+/* Comparador - Trazabilidad Oferta-Demanda */
+.comparador {
+  padding: 20px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Header con botón de descarga */
+.section-header .header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.section-header .header-content > div {
+  flex: 1;
+  min-width: 300px;
+}
+
+/* Botón de Descarga PDF */
+.btn-download-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  white-space: nowrap;
+  min-height: 44px;
+}
+
+.btn-download-pdf:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+.btn-download-pdf:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-download-pdf:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-download-pdf .download-icon {
+  font-size: 18px;
+  animation: bounce 2s infinite;
+}
+
+.btn-download-pdf:hover .download-icon {
+  animation: none;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Spinner pequeño para el botón */
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Área de captura para PDF */
+.pdf-capture-area {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+/* Versión sin padding para captura limpia del PDF */
+.pdf-capture-area.capturing {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Contenedores de gráficos */
+.chart-container {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.chart-container.chart-full {
+  width: 100%;
+}
+
+.chart-container.chart-half {
+  flex: 1;
+  min-width: 0; /* Permite que el contenido se comprima */
+}
+
+.comparador-controls {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.filter-group {
+  margin-bottom: 0;
+}
+
+.filter-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #1e293b;
+}
+
+.filter-group strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.filter-hint {
+  display: block;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: normal;
+  margin-top: 2px;
+}
+
+.filter-select {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1e293b;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-select:hover {
+  border-color: #3b82f6;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.species-count {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #64748b;
+  font-style: italic;
+}
+
+/* Sección de Destino */
+.destino-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.destino-insights {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.destino-insights.chart-full {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  padding: 24px;
+}
+
+.insight-card {
+  background: #f8fafc;
+  border-left: 4px solid #3b82f6;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.insight-card.warning {
+  border-left-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.insight-card.success {
+  border-left-color: #10b981;
+  background: #ecfdf5;
+}
+
+.insight-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.insight-icon {
+  font-size: 20px;
+}
+
+.insight-header strong {
+  color: #1e293b;
+  font-size: 14px;
+}
+
+.insight-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #3b82f6;
+  margin-bottom: 8px;
+}
+
+.insight-card.warning .insight-value {
+  color: #f59e0b;
+}
+
+.insight-card.success .insight-value {
+  color: #10b981;
+}
+
+.insight-detail {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .destino-section {
+    grid-template-columns: 1fr;
+  }
+
+  .section-header .header-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-download-pdf {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .comparador {
+    padding: 12px;
+  }
+
+  .comparador-controls {
+    padding: 16px;
+  }
+
+  .filter-select {
+    max-width: 100%;
+  }
+
+  .insight-card {
+    padding: 12px;
+  }
+
+  .insight-value {
+    font-size: 20px;
+  }
+
+  .btn-download-pdf {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+}

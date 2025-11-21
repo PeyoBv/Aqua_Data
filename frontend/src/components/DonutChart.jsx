@@ -1,6 +1,7 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import './DonutChart.css';
+import './ChartDescription.css';
 
 const COLORS = {
   'Industrial': '#2563eb',
@@ -10,7 +11,7 @@ const COLORS = {
   'ARTESANAL': '#16a34a'
 };
 
-function DonutChart({ data, title }) {
+function DonutChart({ data, title, description }) {
   if (!data || data.length === 0) {
     return (
       <div className="chart-empty">
@@ -19,12 +20,14 @@ function DonutChart({ data, title }) {
     );
   }
 
-  // Calcular porcentajes
+  // Calcular porcentajes y filtrar datos con 0.0%
   const total = data.reduce((sum, item) => sum + (item.value || item.toneladas || 0), 0);
-  const dataWithPercentage = data.map(item => ({
-    ...item,
-    porcentaje: total > 0 ? ((item.value || item.toneladas || 0) / total * 100).toFixed(1) : 0
-  }));
+  const dataWithPercentage = data
+    .map(item => ({
+      ...item,
+      porcentaje: total > 0 ? ((item.value || item.toneladas || 0) / total * 100).toFixed(1) : 0
+    }))
+    .filter(item => parseFloat(item.porcentaje) > 0);
 
   // Generar colores dinámicamente
   const generateColor = (index) => {
@@ -58,6 +61,7 @@ function DonutChart({ data, title }) {
   return (
     <div className="donut-chart-container">
       {title && <h4 className="chart-title">{title}</h4>}
+      {description && <p className="chart-description">{description}</p>}
       <ResponsiveContainer width="100%" height={400}>
         <PieChart>
           <Pie

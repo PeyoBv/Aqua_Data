@@ -234,8 +234,10 @@ function normalizarMateriaPrima(item) {
 }
 
 /**
- * Valida y normaliza un objeto de planta
- * @param {Object} item - Objeto con los datos crudos del CSV
+ * Normaliza un registro del dataset de plantas
+ * Columnas CSV: Id, Ano, Region, Código Planta, Nombre_Planta, Mes, Código_Especie, 
+ *               Nombre_especie, Materia prima, Linea_a, Nm_LINEA, Producción, reproceso
+ * @param {Object} item - Objeto con datos crudos
  * @returns {Object} Objeto normalizado
  */
 function normalizarPlanta(item) {
@@ -243,14 +245,17 @@ function normalizarPlanta(item) {
     id: parsearEntero(item.Id || item.id),
     año: normalizarAnio(item.Ano || item.año || item.ano || item.anio),
     region: normalizarRegion(item.Region || item.region || item.región),
-    cd_planta: parsearEntero(item['Código Planta'] || item.cd_planta),
+    cd_planta: parsearEntero(item['Código Planta'] || item['C�digo Planta'] || item.cd_planta),
     planta: normalizarTexto(item.Nombre_Planta || item.planta),
     mes: normalizarMes(item.Mes || item.mes),
-    cd_especie: parsearEntero(item['Código_Especie'] || item.cd_especie),
+    cd_especie: parsearEntero(item['Código_Especie'] || item['C�digo_Especie'] || item.cd_especie),
     especie: normalizarTexto(item.Nombre_especie || item.especie),
-    tipo_elaboracion: normalizarTexto(item.tipo_elaboracion || item.tipo_elaboración),
+    linea_a: normalizarTexto(item.Linea_a || item.linea_a),
+    nm_linea: normalizarTexto(item.Nm_LINEA || item.nm_linea || item.NM_LINEA),
+    tipo_elaboracion: normalizarTexto(item.Nm_LINEA || item.nm_linea || item.tipo_elaboracion || item.tipo_elaboración),
     toneladas_mp: parsearDecimal(item['Materia prima'] || item.toneladas_mp),
-    toneladas_elaboradas: parsearDecimal(item['Producción'] || item.toneladas_elaboradas)
+    toneladas_elaboradas: parsearDecimal(item['Producción'] || item['Producci�n'] || item.toneladas_elaboradas),
+    reproceso: normalizarTexto(item.reproceso)
   };
 }
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PanoramaRegional from './components/PanoramaRegional';
 import ExploradorDatos from './components/ExploradorDatos';
-import ComparadorDatos from './components/ComparadorDatos';
+import Comparador from './components/Comparador';
 import './App.css';
 
 function App() {
@@ -55,7 +55,7 @@ function App() {
           className={`nav-button ${vistaActual === 'comparador' ? 'active' : ''}`}
           onClick={() => setVistaActual('comparador')}
         >
-          📊 Comparador
+          🔄 Comparador
         </button>
       </nav>
 
@@ -68,7 +68,7 @@ function App() {
           <ExploradorDatos region={regionSeleccionada} />
         )}
         {vistaActual === 'comparador' && (
-          <ComparadorDatos region={regionSeleccionada} />
+          <Comparador region={regionSeleccionada} />
         )}
       </main>
 

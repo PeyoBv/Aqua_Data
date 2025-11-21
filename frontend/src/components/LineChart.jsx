@@ -12,6 +12,7 @@ import {
   Filler
 } from 'chart.js';
 import './LineChart.css';
+import './ChartDescription.css';
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -32,6 +33,7 @@ ChartJS.register(
 const LineChart = ({ 
   data, 
   title = 'Tendencia Mensual',
+  description,
   multiSeries = false,
   series = [],
   xKey = 'mes',
@@ -157,6 +159,7 @@ const LineChart = ({
   return (
     <div className="line-chart-container">
       <h3 className="chart-title">{title}</h3>
+      {description && <p className="chart-description">{description}</p>}
       <div className="chart-wrapper">
         <Line data={chartData} options={options} />
       </div>

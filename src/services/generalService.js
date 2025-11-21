@@ -218,6 +218,83 @@ class GeneralService {
       };
     }
   }
+
+  /**
+   * Obtiene la distribución de líneas de producción (tecnología) por año
+   * @param {string} region - Región a filtrar (default 'TODAS')
+   * @param {string|number} year - Año a filtrar (default año actual)
+   * @returns {Object} Distribución de tecnologías con conteos
+   */
+  static obtenerDistribucionTecnologica(region = 'TODAS', year = null) {
+    try {
+      const plantas = dataStore.getPlantas();
+
+      if (!plantas || plantas.length === 0) {
+        return {
+          success: false,
+          error: 'Dataset de plantas no disponible'
+        };
+      }
+
+      // Determinar año si no se especifica
+      const añoFiltro = year || new Date().getFullYear();
+      
+      console.log(`📊 [DistribucionTecnologica] Filtrando por región=${region}, año=${añoFiltro}`);
+
+      // Filtrar por región
+      let plantasFiltradas = region !== 'TODAS' 
+        ? this.filtrarPorRegion(plantas, region)
+        : plantas;
+
+      // Filtrar por año
+      plantasFiltradas = plantasFiltradas.filter(row => {
+        const rowYear = parseInt(row.año || row.anio || row.ano || row.year);
+        return rowYear === parseInt(añoFiltro);
+      });
+
+      console.log(`📊 [DistribucionTecnologica] Plantas filtradas: ${plantasFiltradas.length} registros`);
+
+      if (plantasFiltradas.length === 0) {
+        return {
+          success: false,
+          error: `No hay datos de plantas para la región ${region} en el año ${añoFiltro}`
+        };
+      }
+
+      // Agrupar por línea de producción y contar
+      const distribucion = {};
+      plantasFiltradas.forEach(row => {
+        const linea = row.linea_produccion || row.linea_elaboracion || 'Sin Especificar';
+        distribucion[linea] = (distribucion[linea] || 0) + 1;
+      });
+
+      // Convertir a array y ordenar por cantidad (mayor a menor)
+      const data = Object.entries(distribucion)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value);
+
+      console.log(`📊 [DistribucionTecnologica] Tecnologías encontradas: ${data.length}`);
+
+      return {
+        success: true,
+        region,
+        year: parseInt(añoFiltro),
+        data,
+        estadisticas: {
+          totalLineas: data.reduce((sum, item) => sum + item.value, 0),
+          tecnologiasDistintas: data.length,
+          tecnologiaPrincipal: data.length > 0 ? data[0].name : null
+        }
+      };
+
+    } catch (error) {
+      console.error('Error en obtenerDistribucionTecnologica:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
 }
 
 module.exports = GeneralService;

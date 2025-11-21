@@ -114,6 +114,7 @@ function PanoramaRegional({ region }) {
             <LineChart
               data={data.grafico_anual}
               title="Comparativa por Año"
+              description="Compara la evolución temporal de la cosecha total contra la capacidad instalada de plantas. Identifica tendencias de crecimiento, estacionalidad y correlación entre extracción y procesamiento industrial."
               multiSeries={true}
               xKey="año"
               series={[
@@ -143,6 +144,7 @@ function PanoramaRegional({ region }) {
             <BarChart
               data={data.principales_especies}
               title="Especies por Toneladas"
+              description="Ranking de las 5 especies más importantes por volumen de extracción. Identifica los recursos pesqueros dominantes en la región y su importancia relativa en la actividad productiva."
               dataKey="especie"
               valueKey="toneladas"
             />

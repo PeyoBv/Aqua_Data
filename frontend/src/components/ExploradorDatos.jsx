@@ -5,8 +5,11 @@ import BarChart from './BarChart';
 import DonutChart from './DonutChart';
 import HorizontalBarChart from './HorizontalBarChart';
 import StackedBarChart from './StackedBarChart';
+import StackedBarChartHorizontal from './StackedBarChartHorizontal';
 import MultiLineChart from './MultiLineChart';
 import GroupedBarChart from './GroupedBarChart';
+import TreemapChart from './TreemapChart';
+import TechnologyDistributionChart from './TechnologyDistributionChart';
 import { 
   explorarDatos, 
   obtenerOpcionesDisponibles,
@@ -17,7 +20,13 @@ import {
   getEstadisticasProduccion,
   getBalanceMasas,
   getPerfilIndustrial,
-  getOpcionesProduccion
+  getOpcionesProduccion,
+  getEstadisticasPlantas,
+  getEvolucionTecnologica,
+  getDistribucionProcesos,
+  getTopComplejos,
+  getOpcionesPlantas,
+  getDistribucionTecnologica
 } from '../services/api';
 
 /**
@@ -62,6 +71,16 @@ function ExploradorDatos({ region }) {
     perfilIndustrial: null
   });
   const [loadingProduccion, setLoadingProduccion] = useState(false);
+
+  // Estados para datos del módulo de Plantas
+  const [dataPlantas, setDataPlantas] = useState({
+    estadisticas: null,
+    evolucionTecnologica: null,
+    distribucionProcesos: null,
+    topComplejos: null,
+    distribucionTecnologica: null
+  });
+  const [loadingPlantas, setLoadingPlantas] = useState(false);
 
   // Cargar opciones disponibles al inicio
   useEffect(() => {
@@ -179,9 +198,34 @@ function ExploradorDatos({ region }) {
           seasonal: seasonal.status === 'fulfilled' ? seasonal.value : seasonal.reason
         });
 
+        // Transformar datos al formato correcto
+        const transformAgentData = (data) => {
+          if (!data?.data) return null;
+          return {
+            ...data,
+            data: data.data.map(item => ({
+              name: item.tipo_agente,
+              value: item.toneladas,
+              porcentaje: item.porcentaje
+            }))
+          };
+        };
+
+        const transformPortsData = (data) => {
+          if (!data?.data) return null;
+          return {
+            ...data,
+            data: data.data.map(item => ({
+              name: item.puerto || item.name,
+              value: item.toneladas || item.value,
+              ranking: item.ranking
+            }))
+          };
+        };
+
         const cosechasData = {
-          agentDistribution: agentDist.status === 'fulfilled' && agentDist.value?.success ? agentDist.value : null,
-          topPorts: ports.status === 'fulfilled' && ports.value?.success ? ports.value : null,
+          agentDistribution: transformAgentData(agentDist.status === 'fulfilled' && agentDist.value?.success ? agentDist.value : null),
+          topPorts: transformPortsData(ports.status === 'fulfilled' && ports.value?.success ? ports.value : null),
           speciesBreakdown: speciesBreak.status === 'fulfilled' && speciesBreak.value?.success ? speciesBreak.value : null,
           seasonalContext: seasonal.status === 'fulfilled' && seasonal.value?.success ? seasonal.value : null
         };
@@ -275,6 +319,74 @@ function ExploradorDatos({ region }) {
 
     fetchProduccionData();
   }, [tipoDato, region, filtrosEspecificos.anio, filtrosEspecificos.especie, filtrosEspecificos.tipo_elaboracion]);
+
+  // Cargar datos específicos del módulo de Plantas
+  useEffect(() => {
+    // Solo cargar si estamos en el dataset de plantas
+    if (tipoDato !== 'plantas') {
+      setDataPlantas({
+        estadisticas: null,
+        evolucionTecnologica: null,
+        distribucionProcesos: null,
+        topComplejos: null,
+        distribucionTecnologica: null
+      });
+      return;
+    }
+
+    const fetchPlantasData = async () => {
+      setLoadingPlantas(true);
+      
+      try {
+        // Preparar filtros
+        const filtros = {};
+        if (region && region !== 'TODAS') filtros.region = region;
+        if (filtrosEspecificos.anio) filtros.anio = filtrosEspecificos.anio;
+
+        console.log('🏢 Cargando datos del módulo de Plantas...', filtros);
+
+        // Llamadas paralelas a las APIs del módulo de Plantas
+        const [estadisticas, evolucionTecnologica, distribucionProcesos, topComplejos, distribucionTecnologica] = await Promise.allSettled([
+          getEstadisticasPlantas(filtros),
+          getEvolucionTecnologica({ region: filtros.region }),
+          getDistribucionProcesos(filtros),
+          getTopComplejos({ ...filtros, top_n: 10 }),
+          getDistribucionTecnologica({ region: filtros.region, year: filtros.anio })
+        ]);
+
+        const plantasData = {
+          estadisticas: estadisticas.status === 'fulfilled' && estadisticas.value?.success ? estadisticas.value.data : null,
+          evolucionTecnologica: evolucionTecnologica.status === 'fulfilled' && evolucionTecnologica.value?.success ? evolucionTecnologica.value : null,
+          distribucionProcesos: distribucionProcesos.status === 'fulfilled' && distribucionProcesos.value?.success ? distribucionProcesos.value.data : null,
+          topComplejos: topComplejos.status === 'fulfilled' && topComplejos.value?.success ? topComplejos.value.data : null,
+          distribucionTecnologica: distribucionTecnologica.status === 'fulfilled' && distribucionTecnologica.value?.success ? distribucionTecnologica.value : null
+        };
+
+        console.log('📊 Data de Plantas procesada:', {
+          estadisticas: plantasData.estadisticas ? 'OK' : 'NULL',
+          evolucionTecnologica: plantasData.evolucionTecnologica?.data?.length || 0,
+          distribucionProcesos: plantasData.distribucionProcesos?.length || 0,
+          topComplejos: plantasData.topComplejos?.length || 0,
+          distribucionTecnologica: plantasData.distribucionTecnologica?.data?.length || 0
+        });
+
+        setDataPlantas(plantasData);
+      } catch (err) {
+        console.error('❌ Error fetching plantas module data:', err);
+        setDataPlantas({
+          estadisticas: null,
+          evolucionTecnologica: null,
+          distribucionProcesos: null,
+          topComplejos: null,
+          distribucionTecnologica: null
+        });
+      } finally {
+        setLoadingPlantas(false);
+      }
+    };
+
+    fetchPlantasData();
+  }, [tipoDato, region, filtrosEspecificos.anio]);
 
   // Manejar cambio de filtros
   const handleFiltroChange = (campo, valor) => {
@@ -515,10 +627,13 @@ function ExploradorDatos({ region }) {
                 <span className="stat-label">Regiones</span>
                 <span className="stat-value">{data.estadisticas?.regionesUnicas || 0}</span>
               </div>
-              <div className="stat-card">
-                <span className="stat-label">Especies</span>
-                <span className="stat-value">{data.estadisticas?.especiesUnicas || 0}</span>
-              </div>
+              {/* Especies: solo mostrar para Cosechas y Producción, NO para Plantas */}
+              {tipoDato !== 'plantas' && (
+                <div className="stat-card">
+                  <span className="stat-label">Especies</span>
+                  <span className="stat-value">{data.estadisticas?.especiesUnicas || 0}</span>
+                </div>
+              )}
               {tipoDato === 'cosecha' && data.estadisticas?.toneladasTotales !== undefined && (
                 <div className="stat-card highlight">
                   <span className="stat-label">Toneladas Totales</span>
@@ -571,6 +686,7 @@ function ExploradorDatos({ region }) {
                         <DonutChart
                           data={dataCosechas.agentDistribution.data}
                           title="Distribución por Agente"
+                          description="Analiza la participación de cada tipo de agente (Acuicultura, Artesanal, Fábrica, Industrial) en el total de desembarques. Identifica qué sector contribuye más a la producción pesquera regional."
                         />
                       </div>
                     ) : (
@@ -587,8 +703,10 @@ function ExploradorDatos({ region }) {
                         <HorizontalBarChart
                           data={dataCosechas.topPorts.data}
                           title="Top 5 Puertos con Mayor Desembarque"
-                          dataKey="puerto"
-                          valueKey="toneladas"
+                          description="Ranking de los puertos más importantes según volumen de desembarque. Identifica los principales puntos de concentración de la actividad pesquera y logística."
+                          dataKey="name"
+                          valueKey="value"
+                          unit="toneladas"
                         />
                       </div>
                     ) : (
@@ -607,6 +725,7 @@ function ExploradorDatos({ region }) {
                       <StackedBarChart
                         data={dataCosechas.speciesBreakdown.data}
                         title="Top 10 Especies - Desglose por Tipo de Agente"
+                        description="Muestra la composición de captura por tipo de agente para las 10 especies más importantes. Permite identificar qué sectores dominan la extracción de cada especie y detectar patrones de especialización."
                         agentTypes={dataCosechas.speciesBreakdown.summary?.tipos_agente || ['ACUICULTURA', 'ARTESANAL', 'FABRICA', 'INDUSTRIAL']}
                       />
                     </div>
@@ -625,6 +744,7 @@ function ExploradorDatos({ region }) {
                       <MultiLineChart
                         data={dataCosechas.seasonalContext.data}
                         title={`Comparación Estacional: ${filtrosEspecificos.anio || '2024'} vs Promedio Histórico`}
+                        description="Compara el comportamiento mensual del año seleccionado contra el promedio histórico. Detecta desviaciones estacionales, meses pico y patrones inusuales en la actividad pesquera."
                         lines={[
                           { 
                             dataKey: 'actual', 
@@ -710,6 +830,7 @@ function ExploradorDatos({ region }) {
                       <GroupedBarChart
                         data={dataProduccion.balanceMasas}
                         title="Balance de Masas por Año"
+                        description="Compara año por año la relación entre materia prima procesada y producción final. El porcentaje de rendimiento indica la eficiencia del proceso industrial y las pérdidas de conversión."
                         bar1Key="materiaPrima"
                         bar1Name="Materia Prima"
                         bar1Color="#3b82f6"
@@ -734,13 +855,133 @@ function ExploradorDatos({ region }) {
                     <div className="chart-container chart-full">
                       <DonutChart
                         data={dataProduccion.perfilIndustrial}
-                        title="Perfil Industrial - Distribución por Línea de Elaboración"
+                        title="Perfil Industrial: Distribución por Línea de Elaboración"
+                        description="Distribuye la producción total según las diferentes líneas de procesamiento (Congelado, Conservas, Harina, etc.). Identifica las tecnologías industriales más utilizadas en la región."
                       />
                     </div>
                   ) : (
                     <div className="chart-container chart-full">
                       <div className="no-data-message">
                         <p>⚠️ No hay datos de perfil industrial</p>
+                        <small>Intenta cambiar los filtros</small>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {/* MÓDULO DE PLANTAS - Infraestructura Industrial */}
+          {tipoDato === 'plantas' && (
+            <div className="plantas-module-section">
+              <h3 className="module-title">🏢 Análisis de Infraestructura Industrial</h3>
+              
+              {loadingPlantas && (
+                <div className="loading-container">
+                  <div className="spinner"></div>
+                  <p>Cargando análisis de plantas...</p>
+                </div>
+              )}
+
+              {!loadingPlantas && (
+                <>
+                  {/* KPIs de Plantas */}
+                  {dataPlantas.estadisticas && (
+                    <div className="kpis-section">
+                      <h4>📊 Indicadores Clave</h4>
+                      <div className="kpis-grid">
+                        <KPICard
+                          title="Plantas Únicas"
+                          value={dataPlantas.estadisticas.plantasUnicas || 0}
+                          icon="🏢"
+                          color="#3b82f6"
+                        />
+                        <KPICard
+                          title="Líneas Instaladas"
+                          value={dataPlantas.estadisticas.lineasInstaladas || 0}
+                          icon="⚙️"
+                          color="#10b981"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Evolución Tecnológica */}
+                  {dataPlantas.evolucionTecnologica?.data && dataPlantas.evolucionTecnologica.data.length > 0 ? (
+                    <div className="chart-container chart-full">
+                      <StackedBarChartHorizontal
+                        data={dataPlantas.evolucionTecnologica.data}
+                        title="Evolución Tecnológica - Composición de Líneas por Año"
+                        description="Muestra cómo cambia la composición de líneas de producción instaladas a través de los años. Identifica tendencias de inversión tecnológica y cambios en el perfil industrial regional."
+                        categories={dataPlantas.evolucionTecnologica.metadata?.lineas || []}
+                      />
+                    </div>
+                  ) : (
+                    <div className="chart-container chart-full">
+                      <div className="no-data-message">
+                        <p>⚠️ No hay datos de evolución tecnológica</p>
+                        <small>Intenta cambiar los filtros</small>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Distribución de Procesos (DonutChart) */}
+                  {dataPlantas.distribucionProcesos && dataPlantas.distribucionProcesos.length > 0 ? (
+                    <div className="chart-container chart-full">
+                      <DonutChart
+                        data={dataPlantas.distribucionProcesos}
+                        title="Distribución de Procesos - Líneas de Producción"
+                        description="Agrupa las plantas según sus líneas de producción instaladas (Congelado, Conservas, Harina, etc.). Muestra la especialización industrial de la infraestructura regional."
+                      />
+                    </div>
+                  ) : (
+                    <div className="chart-container chart-full">
+                      <div className="no-data-message">
+                        <p>⚠️ No hay datos de distribución de procesos</p>
+                        <small>Intenta cambiar los filtros</small>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Distribución Tecnológica Anual (TechnologyDistributionChart) */}
+                  {dataPlantas.distribucionTecnologica?.data && dataPlantas.distribucionTecnologica.data.length > 0 ? (
+                    <div className="chart-container chart-full">
+                      <TechnologyDistributionChart
+                        data={dataPlantas.distribucionTecnologica.data}
+                        estadisticas={dataPlantas.distribucionTecnologica.estadisticas}
+                        region={dataPlantas.distribucionTecnologica.region}
+                        year={dataPlantas.distribucionTecnologica.year}
+                        title="Distribución Tecnológica por Año"
+                        description="Visualiza la distribución de líneas de producción según tecnología instalada en el año seleccionado. Identifica la composición tecnológica de la infraestructura industrial regional."
+                      />
+                    </div>
+                  ) : (
+                    <div className="chart-container chart-full">
+                      <div className="no-data-message">
+                        <p>⚠️ No hay datos de distribución tecnológica</p>
+                        <small>Selecciona un año específico para ver la distribución tecnológica</small>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Top Complejos Industriales */}
+                  {dataPlantas.topComplejos && dataPlantas.topComplejos.length > 0 ? (
+                    <div className="chart-container chart-full">
+                      <HorizontalBarChart
+                        data={dataPlantas.topComplejos}
+                        title="Top 10 Complejos Industriales - Plantas con Más Líneas"
+                        description="Ranking de plantas más diversificadas según cantidad de líneas de producción distintas instaladas. Identifica los complejos industriales más versátiles y con mayor capacidad de procesamiento."
+                        dataKey="name"
+                        valueKey="value"
+                        unit="líneas distintas"
+                        color="#8b5cf6"
+                      />
+                    </div>
+                  ) : (
+                    <div className="chart-container chart-full">
+                      <div className="no-data-message">
+                        <p>⚠️ No hay datos de complejos industriales</p>
                         <small>Intenta cambiar los filtros</small>
                       </div>
                     </div>

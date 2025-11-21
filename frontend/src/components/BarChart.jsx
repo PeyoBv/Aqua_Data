@@ -10,6 +10,7 @@ import {
   Legend
 } from 'chart.js';
 import './BarChart.css';
+import './ChartDescription.css';
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -24,7 +25,7 @@ ChartJS.register(
 /**
  * Componente de gráfico de barras para TOP especies
  */
-const BarChart = ({ data, title = 'TOP Especies', limit = 10 }) => {
+const BarChart = ({ data, title = 'TOP Especies', description, limit = 10 }) => {
   // Tomar solo las primeras 'limit' especies
   const topData = data.slice(0, limit);
 
@@ -124,6 +125,7 @@ const BarChart = ({ data, title = 'TOP Especies', limit = 10 }) => {
   return (
     <div className="bar-chart-container">
       <h3 className="chart-title">{title}</h3>
+      {description && <p className="chart-description">{description}</p>}
       <div className="chart-wrapper">
         <Bar data={chartData} options={options} />
       </div>

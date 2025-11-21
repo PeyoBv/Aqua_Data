@@ -1,6 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './StackedBarChart.css';
+import './ChartDescription.css';
 
 const AGENT_COLORS = {
   'ACUICULTURA': '#f97316',  // Naranja
@@ -12,7 +13,7 @@ const AGENT_COLORS = {
   'Otro': '#94a3b8'           // Gris
 };
 
-function StackedBarChart({ data, title, agentTypes = [] }) {
+function StackedBarChart({ data, title, description, agentTypes = [] }) {
   if (!data || data.length === 0) {
     return (
       <div className="chart-empty">
@@ -42,6 +43,7 @@ function StackedBarChart({ data, title, agentTypes = [] }) {
   return (
     <div className="stacked-bar-chart-container">
       {title && <h4 className="chart-title">{title}</h4>}
+      {description && <p className="chart-description">{description}</p>}
       <ResponsiveContainer width="100%" height={500}>
         <BarChart
           data={data}

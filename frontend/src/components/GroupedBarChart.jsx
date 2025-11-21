@@ -11,6 +11,7 @@ import {
   Cell
 } from 'recharts';
 import './GroupedBarChart.css';
+import './ChartDescription.css';
 
 /**
  * GroupedBarChart - Gráfico de barras agrupadas para comparar 2 series
@@ -19,6 +20,7 @@ import './GroupedBarChart.css';
 function GroupedBarChart({ 
   data = [], 
   title = 'Gráfico de Barras Agrupadas',
+  description,
   bar1Key = 'value1',
   bar1Name = 'Serie 1',
   bar1Color = '#3b82f6',
@@ -73,6 +75,7 @@ function GroupedBarChart({
   return (
     <div className="grouped-bar-chart">
       <h3>{title}</h3>
+      {description && <p className="chart-description">{description}</p>}
       <ResponsiveContainer width="100%" height={height}>
         <BarChart
           data={data}

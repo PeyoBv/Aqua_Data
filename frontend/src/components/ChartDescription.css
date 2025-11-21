@@ -1,0 +1,16 @@
+/* Estilos compartidos para descripciones de gráficos */
+.chart-description {
+  margin: 8px 0 16px 0;
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.5;
+  font-style: italic;
+  padding: 0 4px;
+}
+
+.chart-title {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+}

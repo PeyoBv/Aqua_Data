@@ -6,7 +6,8 @@ import StackedAreaChart from './StackedAreaChart';
 import RegionalComparisonChart from './RegionalComparisonChart';
 import RegionalBalanceChart from './RegionalBalanceChart';
 import YearComparisonChart from './YearComparisonChart';
-import { getEspeciesDisponibles, getTrazabilidad, getMatrizDestino, getEvolucionDestino, getComparacionRegional, getComparacionYoY } from '../services/comparadorApi';
+import SeasonalityHeatmap from './SeasonalityHeatmap';
+import { getEspeciesDisponibles, getTrazabilidad, getMatrizDestino, getEvolucionDestino, getComparacionRegional, getComparacionYoY, getMatrizEstacionalidad } from '../services/comparadorApi';
 import { generateTrazabilidadPDF } from '../utils/pdfGenerator';
 import './Comparador.css';
 
@@ -26,6 +27,7 @@ function Comparador({ region }) {
   const [dataEvolucionDestino, setDataEvolucionDestino] = useState(null);
   const [dataComparacionRegional, setDataComparacionRegional] = useState(null);
   const [dataYoY, setDataYoY] = useState(null);
+  const [dataEstacionalidad, setDataEstacionalidad] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [generatingPDF, setGeneratingPDF] = useState(false);
@@ -77,7 +79,7 @@ function Comparador({ region }) {
 
         console.log('📊 Cargando datos del Comparador...', params, 'Año:', añoSeleccionado);
 
-        const [trazabilidad, matrizDestino, evolucionDestino, comparacionRegional] = await Promise.all([
+        const [trazabilidad, matrizDestino, evolucionDestino, comparacionRegional, estacionalidad] = await Promise.all([
           getTrazabilidad(params),
           getMatrizDestino(params),
           getEvolucionDestino(params),
@@ -85,6 +87,10 @@ function Comparador({ region }) {
             especie: especieSeleccionada, 
             year: añoSeleccionado,
             region: region === 'TODAS' ? 'TODAS' : region  // ✅ Filtro global de región
+          }),
+          getMatrizEstacionalidad({ 
+            especie: especieSeleccionada, 
+            region: region === 'TODAS' ? 'TODAS' : region 
           })
         ]);
 
@@ -104,6 +110,10 @@ function Comparador({ region }) {
 
         if (comparacionRegional.success) {
           setDataComparacionRegional(comparacionRegional);
+        }
+
+        if (estacionalidad.success) {
+          setDataEstacionalidad(estacionalidad);
         }
 
       } catch (err) {
@@ -367,6 +377,17 @@ function Comparador({ region }) {
               </div>
             )}
           </div>
+
+          {/* NUEVA SECCIÓN: Análisis de Estacionalidad (Mapa de Calor) */}
+          {dataEstacionalidad && dataEstacionalidad.data && (
+            <div className="chart-container chart-full" style={{ marginTop: '24px' }}>
+              <SeasonalityHeatmap
+                data={dataEstacionalidad.data}
+                maxValue={dataEstacionalidad.maxValue}
+                especie={especieSeleccionada}
+              />
+            </div>
+          )}
 
           {/* Contenedor para captura PDF - Incluye gráficos y análisis */}
           <div ref={chartsContainerRef} className="charts-section pdf-capture-area">

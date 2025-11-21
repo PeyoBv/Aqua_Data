@@ -181,6 +181,38 @@ class ComparadorController {
       });
     }
   }
+
+  /**
+   * GET /api/v1/comparador/matriz-estacionalidad
+   * Obtiene matriz de estacionalidad (Mapa de Calor)
+   * 
+   * Query params:
+   * - especie: Nombre de la especie (requerido)
+   * - region: LAGOS, AYSEN, MAGALLANES o TODAS (default: TODAS)
+   */
+  static async getMatrizEstacionalidad(req, res) {
+    try {
+      const { especie, region = 'TODAS' } = req.query;
+
+      if (!especie) {
+        return res.status(400).json({
+          success: false,
+          error: 'Parámetro especie es requerido'
+        });
+      }
+
+      const resultado = ComparadorService.obtenerMatrizEstacionalidad(especie, region);
+      res.json(resultado);
+
+    } catch (error) {
+      console.error('Error en getMatrizEstacionalidad:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Error interno del servidor',
+        message: error.message
+      });
+    }
+  }
 }
 
 module.exports = ComparadorController;

@@ -621,6 +621,150 @@ class ComparadorService {
       };
     }
   }
+
+  /**
+   * Obtiene matriz de estacionalidad (Mapa de Calor)
+   * Filas: Años (descendente)
+   * Columnas: Meses (1-12)
+   * Valores: Toneladas capturadas
+   * 
+   * @param {string} especie - Especie a analizar
+   * @param {string} region - Región filtrada
+   * @returns {Object} Matriz de estacionalidad con años y meses completos
+   */
+  static obtenerMatrizEstacionalidad(especie, region) {
+    try {
+      const especieNorm = normalizarTexto(especie);
+      
+      // Verificar si la región es TODAS ANTES de normalizar
+      const regionOriginal = String(region || '').trim().toUpperCase();
+      const esTodasRegiones = regionOriginal === 'TODAS' || regionOriginal === '';
+      const regionNorm = esTodasRegiones ? 'TODAS' : normalizarRegion(region);
+
+      const df_desembarque = dataStore.getDesembarques();
+
+      if (!df_desembarque || df_desembarque.length === 0) {
+        return {
+          success: false,
+          error: 'Dataset de desembarques no disponible',
+          data: []
+        };
+      }
+
+      console.log(`🔍 [Estacionalidad] Filtros: especie=${especie}, region=${region} → regionNorm=${regionNorm}, esTodasRegiones=${esTodasRegiones}`);
+
+      // Filtrar datos por especie y región
+      let debugCount = 0;
+      const registrosFiltrados = df_desembarque.filter(row => {
+        const especieMatch = normalizarTexto(row.especie) === especieNorm;
+        
+        // Normalizar la región de la fila del CSV para comparar manzanas con manzanas
+        const regionFilaNormalizada = normalizarRegion(row.region || row.Region || row.REGION || '');
+        
+        // Si la región solicitada es TODAS, aceptar cualquier región
+        const regionMatch = esTodasRegiones
+          ? true 
+          : regionFilaNormalizada === regionNorm;
+        
+        // Debug log para los primeros 5 registros que coinciden con la especie
+        if (especieMatch && debugCount < 5) {
+          console.log(`🔎 [Debug] Comparando:`, {
+            csv_original: row.region || row.Region || row.REGION,
+            csv_normalizada: regionFilaNormalizada,
+            buscada: regionNorm,
+            match: regionMatch,
+            especie: row.especie,
+            año: row.año,
+            ano: row.ano,
+            mes: row.mes,
+            ton: row.toneladas
+          });
+          debugCount++;
+        }
+        
+        // El objeto normalizado usa 'año' con ñ, no 'ano'
+        return especieMatch && regionMatch && row.año && row.mes && row.toneladas;
+      });
+
+      console.log(`📊 [Estacionalidad] Registros filtrados: ${registrosFiltrados.length}`);
+
+      if (registrosFiltrados.length === 0) {
+        return {
+          success: true,
+          data: [],
+          maxValue: 0
+        };
+      }
+
+      // Agrupar por Año y Mes, sumando toneladas
+      const agrupado = {};
+      
+      registrosFiltrados.forEach(row => {
+        const year = parseInt(row.año); // Usar 'año' con ñ
+        const month = parseInt(row.mes);
+        const toneladas = parseFloat(row.toneladas) || 0;
+
+        if (!agrupado[year]) {
+          agrupado[year] = {};
+        }
+        if (!agrupado[year][month]) {
+          agrupado[year][month] = 0;
+        }
+        agrupado[year][month] += toneladas;
+      });
+
+      // Obtener rango de años
+      const years = Object.keys(agrupado).map(y => parseInt(y)).sort((a, b) => b - a); // Descendente
+      
+      // Nombres de meses en español (orden 1-12)
+      const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+      // Construir matriz completa con relleno de ceros
+      const matrizCompleta = years.map(year => {
+        const months = [];
+        for (let m = 1; m <= 12; m++) {
+          months.push({
+            month: m,
+            monthName: monthNames[m - 1],
+            value: agrupado[year][m] || 0 // Relleno con 0 si no hay dato
+          });
+        }
+        return {
+          year: year,
+          months: months
+        };
+      });
+
+      // Calcular maxValue para la escala de color
+      let maxValue = 0;
+      matrizCompleta.forEach(yearData => {
+        yearData.months.forEach(monthData => {
+          if (monthData.value > maxValue) {
+            maxValue = monthData.value;
+          }
+        });
+      });
+
+      console.log(`📈 [Estacionalidad] Años: ${years.length}, MaxValue: ${maxValue.toFixed(2)} ton`);
+
+      return {
+        success: true,
+        data: matrizCompleta,
+        maxValue: parseFloat(maxValue.toFixed(2)),
+        years: years,
+        especie: especie,
+        region: region
+      };
+
+    } catch (error) {
+      console.error('Error en obtenerMatrizEstacionalidad:', error);
+      return {
+        success: false,
+        error: error.message,
+        data: []
+      };
+    }
+  }
 }
 
 module.exports = ComparadorService;

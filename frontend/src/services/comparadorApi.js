@@ -84,3 +84,20 @@ export const getComparacionYoY = async ({ especie, yearA, yearB, region = 'TODAS
     throw error;
   }
 };
+
+/**
+ * Obtiene matriz de estacionalidad (Mapa de Calor)
+ * Distribuye capturas por Mes (columnas) y Año (filas)
+ */
+export const getMatrizEstacionalidad = async ({ especie, region = 'TODAS' }) => {
+  try {
+    const response = await axios.get(`${API_URL}/comparador/matriz-estacionalidad`, {
+      params: { especie, region }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching matriz estacionalidad:', error);
+    throw error;
+  }
+};
+

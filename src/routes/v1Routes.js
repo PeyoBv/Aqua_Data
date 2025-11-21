@@ -263,4 +263,15 @@ router.get('/comparador/comparacion-regional', ComparadorController.getComparaci
  */
 router.get('/comparador/comparacion-yoy', ComparadorController.getComparacionYoY);
 
+/**
+ * GET /api/v1/comparador/matriz-estacionalidad
+ * Matriz de Estacionalidad (Mapa de Calor)
+ * Distribuye capturas por Mes (columnas) y Año (filas)
+ * 
+ * Query params:
+ * - especie: Nombre de la especie (REQUERIDO)
+ * - region: Región específica (default: TODAS)
+ */
+router.get('/comparador/matriz-estacionalidad', ComparadorController.getMatrizEstacionalidad);
+
 module.exports = router;

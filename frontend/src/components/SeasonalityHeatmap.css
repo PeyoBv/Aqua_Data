@@ -1,0 +1,369 @@
+/* ============================================
+   Contenedor Principal del Mapa de Calor
+   ============================================ */
+.seasonality-heatmap-container {
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+}
+
+/* ============================================
+   Header del Mapa de Calor
+   ============================================ */
+.heatmap-header {
+  margin-bottom: 20px;
+}
+
+.heatmap-title-section {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.heatmap-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 8px 0;
+}
+
+.heatmap-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.heatmap-subtitle strong {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+/* ============================================
+   Barra de Controles de Rango de Años
+   ============================================ */
+.heatmap-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.control-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.year-select {
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e293b;
+  background: white;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.year-select:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.year-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.reset-button {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  background: white;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.reset-button:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e293b;
+}
+
+.reset-button:active {
+  transform: scale(0.98);
+}
+
+/* ============================================
+   Leyenda de Escala de Colores
+   ============================================ */
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.legend-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.legend-gradient {
+  width: 200px;
+  height: 20px;
+  background: linear-gradient(
+    to right,
+    #f1f5f9 0%,
+    rgba(59, 130, 246, 0.3) 25%,
+    rgba(59, 130, 246, 0.6) 50%,
+    rgba(59, 130, 246, 0.9) 75%,
+    rgba(59, 130, 246, 1) 100%
+  );
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+/* ============================================
+   Grid Container - CSS Grid
+   ============================================ */
+.heatmap-grid-wrapper {
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: 80px repeat(12, 70px); /* 1 columna año + 12 meses */
+  gap: 4px;
+  min-width: fit-content;
+}
+
+/* ============================================
+   Celdas del Grid
+   ============================================ */
+.heatmap-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+/* Celda de esquina (Año) */
+.corner-cell {
+  background: #1e293b;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* Headers de Meses */
+.heatmap-header-cell {
+  background: #475569;
+  color: white;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Etiquetas de Años */
+.heatmap-year-cell {
+  background: #64748b;
+  color: white;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* Celdas de Datos (con valores) */
+.heatmap-data-cell {
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  position: relative;
+}
+
+.heatmap-data-cell:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  border-color: #3b82f6;
+  border-width: 2px;
+}
+
+/* ============================================
+   Tooltip al Hacer Hover
+   ============================================ */
+.heatmap-tooltip {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.tooltip-content {
+  background: rgba(30, 41, 59, 0.95);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  text-align: center;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -100%) translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%) translateY(0);
+  }
+}
+
+/* ============================================
+   Estado Vacío (Sin Datos)
+   ============================================ */
+.seasonality-heatmap-empty {
+  width: 100%;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 64px;
+  opacity: 0.3;
+  filter: grayscale(100%);
+  margin-bottom: 16px;
+}
+
+.empty-content {
+  color: #64748b;
+}
+
+.empty-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: #475569;
+  margin: 0 0 8px 0;
+}
+
+.empty-subtitle {
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ============================================
+   Estadísticas Rápidas (Footer)
+   ============================================ */
+.heatmap-stats {
+  display: flex;
+  justify-content: space-around;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  gap: 20px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 18px;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+@media (max-width: 1024px) {
+  .heatmap-grid {
+    grid-template-columns: 60px repeat(12, 55px);
+  }
+
+  .heatmap-cell {
+    min-height: 40px;
+    font-size: 11px;
+  }
+
+  .heatmap-stats {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .seasonality-heatmap-container {
+    padding: 16px;
+  }
+
+  .heatmap-grid {
+    grid-template-columns: 50px repeat(12, 45px);
+    gap: 2px;
+  }
+
+  .heatmap-cell {
+    min-height: 35px;
+    font-size: 10px;
+  }
+
+  .legend-gradient {
+    width: 150px;
+    height: 16px;
+  }
+
+  .legend-label {
+    font-size: 10px;
+  }
+}

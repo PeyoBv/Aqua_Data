@@ -9,14 +9,15 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
+import { calculateValue, formatCurrency, getAxisFormatter } from '../utils/economicCalculator';
 import './ChartDescription.css';
 
 /**
  * Componente de gráfico de áreas apiladas (Stacked Area Chart)
  * Para mostrar la evolución del destino industrial por línea de elaboración
  */
-const StackedAreaChart = ({ data, lineas, title, description }) => {
-  
+const StackedAreaChart = ({ data, lineas, title, description, especie, viewMode }) => {
+
   // Paleta de colores distintivos para cada línea de elaboración
   const COLORES = {
     'HARINA': '#f59e0b',      // Ámbar
@@ -31,10 +32,28 @@ const StackedAreaChart = ({ data, lineas, title, description }) => {
     return COLORES[linea] || COLORES['OTROS'];
   };
 
+  // Transform data if viewMode is USD
+  const chartData = React.useMemo(() => {
+    if (viewMode !== 'USD') return data;
+    return data.map(item => {
+      const newItem = { ...item };
+      Object.keys(item).forEach(key => {
+        if (key !== 'año' && typeof item[key] === 'number') {
+          newItem[key] = calculateValue(especie, item[key]);
+        }
+      });
+      return newItem;
+    });
+  }, [data, viewMode, especie]);
+
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const año = payload[0].payload.año;
       const total = payload.reduce((sum, item) => sum + (item.value || 0), 0);
+
+      const isUSD = viewMode === 'USD';
+      const unit = isUSD ? '' : ' Ton';
+      const formatter = isUSD ? formatCurrency : (val) => val.toLocaleString('es-CL');
 
       return (
         <div style={{
@@ -51,30 +70,30 @@ const StackedAreaChart = ({ data, lineas, title, description }) => {
           {payload
             .sort((a, b) => b.value - a.value)
             .map((entry, index) => (
-              <p key={index} style={{ 
-                margin: '5px 0', 
-                color: entry.color, 
+              <p key={index} style={{
+                margin: '5px 0',
+                color: entry.color,
                 fontSize: '13px',
                 display: 'flex',
                 justifyContent: 'space-between',
                 gap: '12px'
               }}>
                 <span>{entry.name}:</span>
-                <strong>{entry.value.toLocaleString('es-CL')} ton</strong>
+                <strong>{formatter(entry.value)}{unit}</strong>
               </p>
             ))}
-          <p style={{ 
-            margin: '8px 0 0 0', 
-            color: '#1e293b', 
-            fontSize: '13px', 
+          <p style={{
+            margin: '8px 0 0 0',
+            color: '#1e293b',
+            fontSize: '13px',
             fontWeight: 'bold',
-            borderTop: '1px solid #e2e8f0', 
+            borderTop: '1px solid #e2e8f0',
             paddingTop: '8px',
             display: 'flex',
             justifyContent: 'space-between'
           }}>
             <span>Total:</span>
-            <span>{total.toLocaleString('es-CL')} ton</span>
+            <span>{formatter(total)}{unit}</span>
           </p>
         </div>
       );
@@ -97,7 +116,7 @@ const StackedAreaChart = ({ data, lineas, title, description }) => {
     <div style={{ width: '100%', marginBottom: '20px' }}>
       <h3 className="chart-title">{title}</h3>
       {description && <p className="chart-description">{description}</p>}
-      
+
       {!hasData ? (
         <div style={{
           width: '100%',
@@ -136,51 +155,47 @@ const StackedAreaChart = ({ data, lineas, title, description }) => {
       ) : (
         <ResponsiveContainer width="100%" height={420}>
           <AreaChart
-            data={data}
+            data={chartData}
             margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
           >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis 
-            dataKey="año" 
-            stroke="#64748b"
-            style={{ fontSize: '12px', fontWeight: 500 }}
-          />
-          <YAxis 
-            stroke="#64748b"
-            style={{ fontSize: '12px' }}
-            tickFormatter={(value) => {
-              if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
-              if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
-              return value;
-            }}
-            label={{ 
-              value: 'Producción (ton)', 
-              angle: -90, 
-              position: 'insideLeft',
-              style: { fontSize: '12px', fill: '#64748b' }
-            }}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          <Legend 
-            wrapperStyle={{ paddingTop: '15px' }}
-            iconType="rect"
-            formatter={formatearNombreLinea}
-          />
-          
-          {/* Renderizar áreas para cada línea de elaboración */}
-          {lineas && lineas.map((linea, index) => (
-            <Area
-              key={linea}
-              type="monotone"
-              dataKey={linea}
-              name={linea}
-              stackId="1"
-              fill={obtenerColor(linea)}
-              stroke={obtenerColor(linea)}
-              fillOpacity={0.7}
-              strokeWidth={1.5}
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+            <XAxis
+              dataKey="año"
+              stroke="#64748b"
+              style={{ fontSize: '12px', fontWeight: 500 }}
             />
-          ))}
+            <YAxis
+              stroke="#64748b"
+              style={{ fontSize: '12px' }}
+              tickFormatter={getAxisFormatter(viewMode)}
+              label={{
+                value: viewMode === 'USD' ? 'Valor (USD)' : 'Producción (ton)',
+                angle: -90,
+                position: 'insideLeft',
+                style: { fontSize: '12px', fill: '#64748b' }
+              }}
+            />
+            <Tooltip content={<CustomTooltip viewMode={viewMode} />} />
+            <Legend
+              wrapperStyle={{ paddingTop: '15px' }}
+              iconType="rect"
+              formatter={formatearNombreLinea}
+            />
+
+            {/* Renderizar áreas para cada línea de elaboración */}
+            {lineas && lineas.map((linea, index) => (
+              <Area
+                key={linea}
+                type="monotone"
+                dataKey={linea}
+                name={linea}
+                stackId="1"
+                fill={obtenerColor(linea)}
+                stroke={obtenerColor(linea)}
+                fillOpacity={0.7}
+                strokeWidth={1.5}
+              />
+            ))}
           </AreaChart>
         </ResponsiveContainer>
       )}

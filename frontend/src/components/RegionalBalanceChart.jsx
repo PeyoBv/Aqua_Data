@@ -9,6 +9,7 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
+import { calculateValue, formatCurrency, getAxisFormatter } from '../utils/economicCalculator';
 import './ChartDescription.css';
 
 /**
@@ -17,8 +18,8 @@ import './ChartDescription.css';
  * Colores armonizados con AreaLineChart principal
  * SOLO MUESTRA TOP 4 REGIONES + OTRAS
  */
-const RegionalBalanceChart = ({ data, title, description, especie }) => {
-  
+const RegionalBalanceChart = ({ data, title, description, especie, viewMode }) => {
+
   // Colores armonizados con el gráfico principal de Trazabilidad (AreaLineChart)
   const COLORS = {
     CAPTURA: '#3b82f6',      // Azul - mismo que Desembarque
@@ -28,7 +29,7 @@ const RegionalBalanceChart = ({ data, title, description, especie }) => {
   // ========================================
   // PROCESAMIENTO DE DATOS: TOP 4 + OTRAS
   // ========================================
-  
+
   // 1. Validar que existan datos
   if (!data || data.length === 0) {
     return (
@@ -39,19 +40,29 @@ const RegionalBalanceChart = ({ data, title, description, especie }) => {
     );
   }
 
-  // 2. Ordenar regiones específicas por CAPTURA descendente
-  const sortedData = [...data].sort((a, b) => b.captura - a.captura);
+  // 2. Transform data if viewMode is USD
+  const chartData = React.useMemo(() => {
+    if (viewMode !== 'USD') return data;
+    return data.map(item => ({
+      ...item,
+      captura: calculateValue(especie, item.captura),
+      procesamiento: calculateValue(especie, item.procesamiento)
+    }));
+  }, [data, viewMode, especie]);
 
-  // 3. Tomar TOP 4 regiones
+  // 3. Ordenar regiones específicas por CAPTURA descendente
+  const sortedData = [...(chartData || [])].sort((a, b) => b.captura - a.captura);
+
+  // 4. Tomar TOP 4 regiones
   const topRegions = sortedData.slice(0, 4);
 
-  // 4. Calcular el RESTO (regiones 5 en adelante)
+  // 5. Calcular el RESTO (regiones 5 en adelante)
   const otherRegions = sortedData.slice(4);
-  
-  // 5. Inicializar array final con TOP 4 ordenadas
+
+  // 6. Inicializar array final con TOP 4 ordenadas
   let finalData = [...topRegions];
 
-  // 6. REGLA "Hide Empty": Solo agregar "OTRAS" si tiene datos reales
+  // 7. REGLA "Hide Empty": Solo agregar "OTRAS" si tiene datos reales
   if (otherRegions.length > 0) {
     const otherCaptura = otherRegions.reduce((sum, item) => sum + (item.captura || 0), 0);
     const otherProcesamiento = otherRegions.reduce((sum, item) => sum + (item.procesamiento || 0), 0);
@@ -67,12 +78,6 @@ const RegionalBalanceChart = ({ data, title, description, especie }) => {
     }
   }
 
-  // 7. DEPURACIÓN: Verificar estructura final
-  console.log('🔍 [RegionalBalanceChart] Datos originales:', data.length, 'regiones');
-  console.log('📊 [RegionalBalanceChart] TOP 4 ordenadas:', topRegions.map(r => r.region));
-  console.log('📌 [RegionalBalanceChart] OTRAS agregada:', finalData.length > 4 ? 'SÍ' : 'NO');
-  console.log('✅ [RegionalBalanceChart] Total barras a graficar:', finalData.length);
-
   // ========================================
   // TOOLTIP PERSONALIZADO
   // ========================================
@@ -82,6 +87,10 @@ const RegionalBalanceChart = ({ data, title, description, especie }) => {
       const procesamiento = payload.find(p => p.dataKey === 'procesamiento')?.value || 0;
       const porcentaje = captura > 0 ? ((procesamiento / captura) * 100).toFixed(1) : 0;
       const brecha = captura - procesamiento;
+
+      const isUSD = viewMode === 'USD';
+      const unit = isUSD ? '' : ' Ton';
+      const formatter = isUSD ? formatCurrency : (val) => val.toLocaleString('es-CL');
 
       return (
         <div style={{
@@ -95,36 +104,36 @@ const RegionalBalanceChart = ({ data, title, description, especie }) => {
           <p style={{ margin: '0 0 10px 0', fontWeight: 'bold', color: '#1e293b', fontSize: '14px' }}>
             📍 {label}
           </p>
-          <p style={{ 
-            margin: '5px 0', 
-            color: COLORS.CAPTURA, 
+          <p style={{
+            margin: '5px 0',
+            color: COLORS.CAPTURA,
             fontSize: '13px',
             display: 'flex',
             justifyContent: 'space-between',
             gap: '12px'
           }}>
-            <span>🎣 Captura:</span>
-            <strong>{captura.toLocaleString('es-CL')} ton</strong>
+            <span>{isUSD ? '💰 Valor Captura:' : '🎣 Captura:'}</span>
+            <strong>{formatter(captura)}{unit}</strong>
           </p>
-          <p style={{ 
-            margin: '5px 0', 
-            color: COLORS.PROCESAMIENTO, 
+          <p style={{
+            margin: '5px 0',
+            color: COLORS.PROCESAMIENTO,
             fontSize: '13px',
             display: 'flex',
             justifyContent: 'space-between',
             gap: '12px'
           }}>
-            <span>🏭 Procesamiento:</span>
-            <strong>{procesamiento.toLocaleString('es-CL')} ton</strong>
+            <span>{isUSD ? '💰 Valor Procesamiento:' : '🏭 Procesamiento:'}</span>
+            <strong>{formatter(procesamiento)}{unit}</strong>
           </p>
-          <div style={{ 
-            margin: '10px 0 0 0', 
+          <div style={{
+            margin: '10px 0 0 0',
             paddingTop: '8px',
             borderTop: '1px solid #e2e8f0'
           }}>
-            <p style={{ 
-              margin: '4px 0', 
-              color: '#64748b', 
+            <p style={{
+              margin: '4px 0',
+              color: '#64748b',
               fontSize: '12px',
               display: 'flex',
               justifyContent: 'space-between'
@@ -132,15 +141,15 @@ const RegionalBalanceChart = ({ data, title, description, especie }) => {
               <span>✅ Procesado:</span>
               <strong>{porcentaje}%</strong>
             </p>
-            <p style={{ 
-              margin: '4px 0', 
-              color: '#94a3b8', 
+            <p style={{
+              margin: '4px 0',
+              color: '#94a3b8',
               fontSize: '12px',
               display: 'flex',
               justifyContent: 'space-between'
             }}>
-              <span>📊 Brecha:</span>
-              <strong>{brecha.toLocaleString('es-CL')} ton</strong>
+              <span>{isUSD ? '💰 Valor Brecha:' : '📊 Brecha:'}</span>
+              <strong>{formatter(brecha)}{unit}</strong>
             </p>
           </div>
         </div>
@@ -164,52 +173,48 @@ const RegionalBalanceChart = ({ data, title, description, especie }) => {
           barSize={45}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          
+
           {/* Eje Y = Nombres de Regiones (con espacio optimizado) */}
-          <YAxis 
+          <YAxis
             type="category"
-            dataKey="region" 
+            dataKey="region"
             stroke="#64748b"
             style={{ fontSize: '14px', fontWeight: 500 }}
             width={120}
             tick={{ fill: '#1e293b' }}
           />
-          
-          {/* Eje X = Toneladas */}
-          <XAxis 
+
+          {/* Eje X = Toneladas o USD */}
+          <XAxis
             type="number"
             stroke="#64748b"
             style={{ fontSize: '12px' }}
-            tickFormatter={(value) => {
-              if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
-              if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
-              return value;
-            }}
-            label={{ 
-              value: 'Toneladas', 
+            tickFormatter={getAxisFormatter(viewMode)}
+            label={{
+              value: viewMode === 'USD' ? 'Valor (USD)' : 'Toneladas',
               position: 'insideBottom',
               offset: -10,
               style: { fontSize: '12px', fill: '#64748b' }
             }}
           />
-          
-          <Tooltip content={<CustomTooltip />} />
-          <Legend 
+
+          <Tooltip content={<CustomTooltip viewMode={viewMode} />} />
+          <Legend
             wrapperStyle={{ paddingTop: '15px' }}
             iconType="rect"
           />
-          
+
           {/* Barra de Captura (Azul - mismo color que AreaLineChart) */}
-          <Bar 
-            dataKey="captura" 
+          <Bar
+            dataKey="captura"
             name="Captura Total"
             fill={COLORS.CAPTURA}
             radius={[0, 8, 8, 0]}
           />
-          
+
           {/* Barra de Procesamiento (Verde - mismo color que AreaLineChart) */}
-          <Bar 
-            dataKey="procesamiento" 
+          <Bar
+            dataKey="procesamiento"
             name="Procesamiento Industrial"
             fill={COLORS.PROCESAMIENTO}
             radius={[0, 8, 8, 0]}

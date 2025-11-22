@@ -107,17 +107,18 @@ def main():
     separators = [',', ';']
     
     print(f"Loading data from {DATA_PATH}...")
-    for encoding in encodings:
-        for sep in separators:
-            try:
-                temp_df = pd.read_csv(DATA_PATH, sep=sep, encoding=encoding)
-                if len(temp_df.columns) > 1:
-                    df = temp_df
-                    break
-            except Exception:
-                continue
-        if df is not None:
-            break
+    print(f"Loading data from {DATA_PATH}...")
+    # Force semicolon separator as verified by debug script
+    try:
+        df = pd.read_csv(DATA_PATH, sep=';', encoding='latin-1')
+        print("Successfully loaded with separator ';'")
+    except Exception as e:
+        print(f"Error loading with ';': {e}")
+        sys.exit(1)
+        
+    if df is not None:
+        print("First row sample:")
+        print(df.iloc[0].to_dict())
     
     if df is None:
         print("Error: Could not read CSV.")
@@ -129,7 +130,22 @@ def main():
     # Identify columns
     print(f"Columns found: {df.columns.tolist()}")
     
-    species_col = next((c for c in df.columns if 'ESPECIE' in c), None)
+    # Smart Species Column Detection
+    # Prioritize columns with 'ESPECIE' but exclude 'COD', 'CD', 'ID' to find the name
+    species_candidates = [c for c in df.columns if 'ESPECIE' in c]
+    name_candidates = [c for c in species_candidates if not any(x in c for x in ['COD', 'CD', 'ID'])]
+    
+    if name_candidates:
+        # Prefer column with 'NOM' or 'NOMBRE'
+        best_name = next((c for c in name_candidates if 'NOM' in c), None)
+        if best_name:
+            species_col = best_name
+        else:
+            species_col = name_candidates[0]
+    elif species_candidates:
+        species_col = species_candidates[0]
+    else:
+        species_col = None
     date_col = next((c for c in df.columns if 'FECHA' in c or 'ANO' in c or 'AÑO' in c), None)
     region_col = next((c for c in df.columns if 'REGION' in c), None)
 

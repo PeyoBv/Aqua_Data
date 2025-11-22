@@ -10,13 +10,14 @@ import SeasonalityHeatmap from './SeasonalityHeatmap';
 import { getEspeciesDisponibles, getTrazabilidad, getMatrizDestino, getEvolucionDestino, getComparacionRegional, getComparacionYoY, getMatrizEstacionalidad } from '../services/comparadorApi';
 import ForecastChart from './ForecastChart';
 import { generateTrazabilidadPDF } from '../utils/pdfGenerator';
+import { calculateValue, formatCurrency } from '../utils/economicCalculator';
 import './Comparador.css';
 
 /**
  * Vista 3: Comparador - Trazabilidad Oferta-Demanda
  * Cruza datos de Cosechas (Oferta) con Producción (Demanda)
  */
-function Comparador({ region }) {
+function Comparador({ region, viewMode }) {
   const [especies, setEspecies] = useState([]);
   const [especieSeleccionada, setEspecieSeleccionada] = useState('');
   const [añoSeleccionado, setAñoSeleccionado] = useState('TODOS');
@@ -372,18 +373,32 @@ function Comparador({ region }) {
                 }
               }
 
+              // Economic Layer Conversion
+              const isUSD = viewMode === 'USD';
+              const displayDesembarque = isUSD
+                ? formatCurrency(calculateValue(especieSeleccionada, kpiData.desembarque))
+                : `${kpiData.desembarque.toLocaleString('es-CL')} ton`;
+
+              const displayMateriaPrima = isUSD
+                ? formatCurrency(calculateValue(especieSeleccionada, kpiData.materiaPrima))
+                : `${kpiData.materiaPrima.toLocaleString('es-CL')} ton`;
+
+              const displayBrecha = isUSD
+                ? formatCurrency(calculateValue(especieSeleccionada, kpiData.brecha))
+                : `${kpiData.brecha.toLocaleString('es-CL')} ton`;
+
               return (
                 <>
                   <KPICard
-                    title="Total Desembarcado"
-                    value={`${kpiData.desembarque.toLocaleString('es-CL')} ton`}
-                    icon="🎣"
+                    title={isUSD ? "Valor Total Desembarcado" : "Total Desembarcado"}
+                    value={displayDesembarque}
+                    icon={isUSD ? "💰" : "🎣"}
                     color="#3b82f6"
                     description={`Oferta total de ${especieSeleccionada} (${kpiData.periodo})`}
                   />
                   <KPICard
-                    title="Materia Prima Industrial"
-                    value={`${kpiData.materiaPrima.toLocaleString('es-CL')} ton`}
+                    title={isUSD ? "Valor Materia Prima Ind." : "Materia Prima Industrial"}
+                    value={displayMateriaPrima}
                     icon="🏭"
                     color="#10b981"
                     description={`Volumen que ingresa a plantas (${kpiData.periodo})`}
@@ -396,8 +411,8 @@ function Comparador({ region }) {
                     description={`¿Cuánto de la captura entra a plantas?`}
                   />
                   <KPICard
-                    title="Otros Destinos"
-                    value={`${kpiData.brecha.toLocaleString('es-CL')} ton`}
+                    title={isUSD ? "Valor Otros Destinos" : "Otros Destinos"}
+                    value={displayBrecha}
                     icon="⚠️"
                     color="#f59e0b"
                     description="Consumo fresco, exportación directa, harina artesanal"
@@ -417,6 +432,8 @@ function Comparador({ region }) {
                   lineas={dataEvolucionDestino.lineas}
                   title="Evolución del Destino Industrial (Por Línea de Elaboración)"
                   description={`Muestra la transformación de la materia prima de ${especieSeleccionada} en diferentes productos industriales a lo largo del tiempo. Cada color representa una línea de elaboración (Harina, Congelado, Conserva, etc.). Las áreas apiladas permiten visualizar tanto la contribución individual como el volumen total procesado por año.`}
+                  viewMode={viewMode}
+                  especie={especieSeleccionada}
                 />
               </div>
             )}
@@ -429,6 +446,7 @@ function Comparador({ region }) {
                   title="Comparación Regional: Captura vs Procesamiento"
                   description={`Análisis logístico de ${especieSeleccionada}: dónde se captura el recurso (barras azules) versus dónde se procesa industrialmente (barras naranjas). Esta comparación revela patrones de movilización de materia prima entre regiones y ayuda a identificar oportunidades de integración vertical o eficiencias logísticas.`}
                   especie={especieSeleccionada}
+                  viewMode={viewMode}
                 />
               </div>
             )}
@@ -441,6 +459,7 @@ function Comparador({ region }) {
                 data={dataEstacionalidad.data}
                 maxValue={dataEstacionalidad.maxValue}
                 especie={especieSeleccionada}
+                viewMode={viewMode}
               />
             </div>
           )}
@@ -541,6 +560,8 @@ function Comparador({ region }) {
                   data={dataTrazabilidad.data}
                   title={`Trazabilidad de Volumen: ${especieSeleccionada}`}
                   description="Compara año a año el volumen desembarcado (área azul) contra la materia prima que ingresa a plantas industriales (línea verde). La brecha indica destinos alternativos: consumo fresco, exportación sin procesar o elaboración artesanal."
+                  viewMode={viewMode}
+                  especie={especieSeleccionada}
                 />
               ) : (
                 dataYoY && (
@@ -549,6 +570,7 @@ function Comparador({ region }) {
                     yearA={añoA}
                     yearB={añoB}
                     especie={especieSeleccionada}
+                    viewMode={viewMode}
                   />
                 )
               )}
@@ -562,6 +584,8 @@ function Comparador({ region }) {
                     data={dataMatrizDestino.destinos}
                     title="Matriz de Destino"
                     description="Distribución del destino final de la captura. El procesamiento industrial representa la fracción que entra a plantas de elaboración, mientras que 'Otros Destinos' incluye consumo humano directo, exportación sin procesar y elaboración artesanal."
+                    viewMode={viewMode}
+                    especie={especieSeleccionada}
                   />
                 </div>
 
@@ -576,6 +600,7 @@ function Comparador({ region }) {
                       description={`Balance entre captura (azul) y procesamiento (verde) de ${especieSeleccionada} por región${añoSeleccionado !== 'TODOS' ? ` en el año ${añoSeleccionado}` : ' en el período 2010-2024'}. Las barras horizontales facilitan la lectura de nombres de regiones. Identifica oportunidades de integración vertical y eficiencias en la cadena de suministro.`}
                       especie={especieSeleccionada}
                       year={añoSeleccionado}
+                      viewMode={viewMode}
                     />
                   </div>
                 )}
@@ -656,6 +681,7 @@ function Comparador({ region }) {
         <ForecastChart
           species={especieSeleccionada}
           region={region === 'TODAS' ? 'TODAS' : region}
+          viewMode={viewMode}
         />
       </div>
     </div>

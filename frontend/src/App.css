@@ -479,8 +479,13 @@ body {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-container p,
@@ -678,9 +683,50 @@ body {
   .charts-row {
     grid-template-columns: 1fr;
   }
-  
+
   .cosechas-module-section {
     padding: 1rem;
   }
 }
 
+
+/* Header Controls */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.view-mode-toggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.toggle-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.toggle-btn.active {
+  background: white;
+  color: #1e3a8a;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

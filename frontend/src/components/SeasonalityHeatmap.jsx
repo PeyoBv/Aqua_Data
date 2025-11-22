@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './SeasonalityHeatmap.css';
+import { calculateValue, formatCurrency } from '../utils/economicCalculator';
 
 /**
  * Componente de Mapa de Calor Estacional - A PRUEBA DE BALAS
@@ -8,12 +9,12 @@ import './SeasonalityHeatmap.css';
  * @param {Array} rawData - Datos crudos del backend (puede venir en cualquier formato)
  * @param {string} especie - Nombre de la especie analizada
  */
-const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, especie = '' }) => {
+const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, especie = '', viewMode }) => {
   const [hoveredCell, setHoveredCell] = useState(null);
   const [processedData, setProcessedData] = useState([]);
   const [maxValue, setMaxValue] = useState(0);
   const [parseErrors, setParseErrors] = useState([]);
-  
+
   // Estados para filtro de rango de años
   const [startYear, setStartYear] = useState(null);
   const [endYear, setEndYear] = useState(null);
@@ -28,7 +29,7 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
     console.log("📦 RAW DATA RECIBIDA:", rawData);
     console.log("📊 Tipo de dato:", Array.isArray(rawData) ? 'Array' : typeof rawData);
     console.log("📏 Longitud:", rawData?.length);
-    
+
     if (rawData && rawData.length > 0) {
       console.log("🔬 ESTRUCTURA DEL PRIMER REGISTRO:");
       console.log(JSON.stringify(rawData[0], null, 2));
@@ -52,10 +53,10 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
       console.log(`\n📅 Procesando registro #${index}:`, yearRecord);
 
       // 1. Extraer AÑO con múltiples fallbacks (case-insensitive)
-      const yearRaw = yearRecord.year || yearRecord.Year || yearRecord.año || 
-                      yearRecord.Año || yearRecord.YEAR || yearRecord.ANO;
+      const yearRaw = yearRecord.year || yearRecord.Year || yearRecord.año ||
+        yearRecord.Año || yearRecord.YEAR || yearRecord.ANO;
       const year = parseInt(String(yearRaw), 10);
-      
+
       if (isNaN(year) || year < 1900 || year > 2100) {
         const error = `❌ Año inválido en registro #${index}: ${yearRaw}`;
         console.error(error);
@@ -66,9 +67,9 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
       console.log(`✅ Año detectado: ${year}`);
 
       // 2. Extraer MESES con múltiples fallbacks
-      const monthsRaw = yearRecord.months || yearRecord.Months || 
-                        yearRecord.meses || yearRecord.Meses || 
-                        yearRecord.MONTHS || yearRecord.MESES || [];
+      const monthsRaw = yearRecord.months || yearRecord.Months ||
+        yearRecord.meses || yearRecord.Meses ||
+        yearRecord.MONTHS || yearRecord.MESES || [];
 
       if (!Array.isArray(monthsRaw)) {
         const error = `❌ Meses no es un array en registro #${index}`;
@@ -82,9 +83,9 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
       // 3. Procesar cada mes con validación ESTRICTA
       const processedMonths = monthsRaw.map((monthRecord, mIndex) => {
         // 3.1 Extraer MES (número 1-12)
-        const mesRaw = monthRecord.month || monthRecord.Month || 
-                       monthRecord.mes || monthRecord.Mes || 
-                       monthRecord.MONTH || monthRecord.MES;
+        const mesRaw = monthRecord.month || monthRecord.Month ||
+          monthRecord.mes || monthRecord.Mes ||
+          monthRecord.MONTH || monthRecord.MES;
         const mesIndex = parseInt(String(mesRaw), 10);
 
         // VALIDACIÓN DE RANGO: 1-12
@@ -94,22 +95,22 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
         }
 
         // 3.2 Extraer NOMBRE DEL MES
-        const monthNameRaw = monthRecord.monthName || monthRecord.MonthName || 
-                             monthRecord.monthname || monthRecord.nombreMes ||
-                             monthRecord.month_name || monthRecord.name ||
-                             // Fallback: Generar nombre si no existe
-                             ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 
-                              'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'][mesIndex - 1];
-        
+        const monthNameRaw = monthRecord.monthName || monthRecord.MonthName ||
+          monthRecord.monthname || monthRecord.nombreMes ||
+          monthRecord.month_name || monthRecord.name ||
+          // Fallback: Generar nombre si no existe
+          ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+            'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'][mesIndex - 1];
+
         const monthName = String(monthNameRaw).substring(0, 3); // Truncar a 3 caracteres
 
         // 3.3 Extraer VALOR (toneladas) con CONVERSIÓN FORZADA
-        const valRaw = monthRecord.value || monthRecord.Value || 
-                       monthRecord.toneladas || monthRecord.Toneladas ||
-                       monthRecord.TONELADAS || monthRecord.ton || 0;
+        const valRaw = monthRecord.value || monthRecord.Value ||
+          monthRecord.toneladas || monthRecord.Toneladas ||
+          monthRecord.TONELADAS || monthRecord.ton || 0;
 
         let value = 0;
-        
+
         // Si es string, limpiar formato europeo (1.234,56) → 1234.56
         if (typeof valRaw === 'string') {
           const cleaned = valRaw
@@ -137,12 +138,12 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
       // Verificar que tengamos 12 meses
       if (processedMonths.length !== 12) {
         console.warn(`⚠️ Año ${year} tiene ${processedMonths.length} meses en lugar de 12. Rellenando...`);
-        
+
         // Rellenar meses faltantes con ceros
-        const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 
-                            'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+          'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
         const completeMonths = [];
-        
+
         for (let i = 1; i <= 12; i++) {
           const existingMonth = processedMonths.find(m => m.month === i);
           if (existingMonth) {
@@ -155,7 +156,7 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
             });
           }
         }
-        
+
         return {
           year: year,
           months: completeMonths
@@ -172,7 +173,7 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
     console.log(`📊 Años procesados: ${processedYears.length}`);
     console.log(`📈 Valor máximo calculado: ${calculatedMaxValue}`);
     console.log(`❌ Errores encontrados: ${errors.length}`);
-    
+
     if (errors.length > 0) {
       console.error("🚨 ERRORES DE PARSING:", errors);
     }
@@ -185,18 +186,35 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
     if (processedYears.length > 0) {
       const years = processedYears.map(y => y.year).sort((a, b) => a - b);
       setAvailableYears(years);
-      
+
       // Si no hay filtros configurados, mostrar últimos 10 años por defecto
       if (startYear === null || endYear === null) {
         const currentYear = new Date().getFullYear();
         const defaultStartYear = Math.max(years[0], currentYear - 9);
         const defaultEndYear = years[years.length - 1];
-        
+
         setStartYear(defaultStartYear);
         setEndYear(defaultEndYear);
       }
     }
   }, [rawData]);
+
+  // Transform data if viewMode is USD
+  const finalProcessedData = React.useMemo(() => {
+    if (viewMode !== 'USD') return processedData;
+    return processedData.map(yearData => ({
+      ...yearData,
+      months: yearData.months.map(monthData => ({
+        ...monthData,
+        value: calculateValue(especie, monthData.value)
+      }))
+    }));
+  }, [processedData, viewMode, especie]);
+
+  const finalMaxValue = React.useMemo(() => {
+    if (viewMode !== 'USD') return maxValue;
+    return calculateValue(especie, maxValue);
+  }, [maxValue, viewMode, especie]);
 
   // Validar datos procesados
   if (!processedData || processedData.length === 0) {
@@ -224,7 +242,7 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
   }
 
   // Filtrar datos por rango de años seleccionado
-  const filteredData = processedData.filter(yearData => {
+  const filteredData = finalProcessedData.filter(yearData => {
     if (startYear === null || endYear === null) return true;
     return yearData.year >= startYear && yearData.year <= endYear;
   });
@@ -252,23 +270,24 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
     if (value === 0) {
       return '#f1f5f9';
     }
-    
+
     // VISIBILIDAD GARANTIZADA: Escala logarítmica
     // Opacidad mínima 40% para cualquier valor > 0
     // Escala logarítmica para dar peso visual a valores medios
     const opacity = 0.4 + (0.6 * (Math.log(value + 1) / Math.log(filteredMaxValue + 1)));
-    
+
     // Asegurar que opacity esté entre 0.4 y 1
     const finalOpacity = Math.max(0.4, Math.min(1, opacity));
-    
+
     return `rgba(59, 130, 246, ${finalOpacity})`; // Azul corporativo con opacidad calculada
   };
 
   /**
-   * Formatea las toneladas para el tooltip
+   * Formatea el valor para el tooltip
    */
-  const formatToneladas = (value) => {
-    if (value === 0 || value === null) return '0 Ton';
+  const formatValue = (value) => {
+    if (value === 0 || value === null) return viewMode === 'USD' ? formatCurrency(0) : '0 Ton';
+    if (viewMode === 'USD') return formatCurrency(value);
     if (value >= 1000) {
       return `${(value / 1000).toFixed(1)} K Ton`;
     }
@@ -315,7 +334,7 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
             Distribución mensual de capturas de <strong>{especie}</strong>
           </p>
         </div>
-        
+
         {/* Barra de Controles de Rango */}
         {availableYears.length > 0 && (
           <div className="heatmap-controls">
@@ -332,7 +351,7 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
                 ))}
               </select>
             </div>
-            
+
             <div className="control-group">
               <label htmlFor="end-year" className="control-label">Hasta:</label>
               <select
@@ -346,7 +365,7 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
                 ))}
               </select>
             </div>
-            
+
             <button
               className="reset-button"
               onClick={handleResetRange}
@@ -373,9 +392,9 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
         <>
           {/* Leyenda de Escala */}
           <div className="heatmap-legend">
-            <span className="legend-label">Baja Captura</span>
+            <span className="legend-label">Baja {viewMode === 'USD' ? 'Valor' : 'Captura'}</span>
             <div className="legend-gradient" />
-            <span className="legend-label">Alta Captura ({formatToneladas(filteredMaxValue)})</span>
+            <span className="legend-label">Alta {viewMode === 'USD' ? 'Valor' : 'Captura'} ({formatValue(filteredMaxValue)})</span>
           </div>
 
           {/* Grid Container */}
@@ -427,8 +446,8 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
               </span>
             </div>
             <div className="stat-item">
-              <span className="stat-label">Captura Máxima:</span>
-              <span className="stat-value">{formatToneladas(filteredMaxValue)}</span>
+              <span className="stat-label">{viewMode === 'USD' ? 'Valor Máximo:' : 'Captura Máxima:'}</span>
+              <span className="stat-value">{formatValue(filteredMaxValue)}</span>
             </div>
           </div>
         </>
@@ -448,7 +467,7 @@ const SeasonalityHeatmap = ({ data: rawData = [], maxValue: rawMaxValue = 0, esp
           <div className="tooltip-content">
             <strong>{hoveredCell.month} {hoveredCell.year}</strong>
             <br />
-            {formatToneladas(hoveredCell.value)}
+            {formatValue(hoveredCell.value)}
           </div>
         </div>
       )}

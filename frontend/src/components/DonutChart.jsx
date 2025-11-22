@@ -1,5 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { calculateValue, formatCurrency } from '../utils/economicCalculator';
 import './DonutChart.css';
 import './ChartDescription.css';
 
@@ -11,7 +12,7 @@ const COLORS = {
   'ARTESANAL': '#16a34a'
 };
 
-function DonutChart({ data, title, description }) {
+function DonutChart({ data, title, description, viewMode, especie }) {
   if (!data || data.length === 0) {
     return (
       <div className="chart-empty">
@@ -21,8 +22,17 @@ function DonutChart({ data, title, description }) {
   }
 
   // Calcular porcentajes y filtrar datos con 0.0%
-  const total = data.reduce((sum, item) => sum + (item.value || item.toneladas || 0), 0);
-  const dataWithPercentage = data
+  // Transform data if viewMode is USD
+  const chartData = React.useMemo(() => {
+    if (viewMode !== 'USD') return data;
+    return data.map(item => ({
+      ...item,
+      value: calculateValue(especie, item.value || item.toneladas || 0)
+    }));
+  }, [data, viewMode, especie]);
+
+  const total = (chartData || data).reduce((sum, item) => sum + (item.value || item.toneladas || 0), 0);
+  const dataWithPercentage = (chartData || data)
     .map(item => ({
       ...item,
       porcentaje: total > 0 ? ((item.value || item.toneladas || 0) / total * 100).toFixed(1) : 0
@@ -45,12 +55,16 @@ function DonutChart({ data, title, description }) {
       const value = payload[0].value || 0;
       const name = payload[0].name || 'Sin nombre';
       const porcentaje = payload[0].payload.porcentaje || 0;
-      
+
+      const isUSD = viewMode === 'USD';
+      const unit = isUSD ? '' : ' Ton';
+      const formatter = isUSD ? formatCurrency : (val) => val.toLocaleString('es-CL');
+
       return (
         <div className="custom-tooltip">
           <p className="tooltip-label">{name}</p>
           <p className="tooltip-value">
-            {value.toLocaleString('es-CL')} ton ({porcentaje}%)
+            {formatter(value)}{unit} ({porcentaje}%)
           </p>
         </div>
       );
@@ -77,15 +91,15 @@ function DonutChart({ data, title, description }) {
             label={({ porcentaje }) => `${porcentaje}%`}
           >
             {dataWithPercentage.map((entry, index) => (
-              <Cell 
-                key={`cell-${index}`} 
-                fill={generateColor(index)} 
+              <Cell
+                key={`cell-${index}`}
+                fill={generateColor(index)}
               />
             ))}
           </Pie>
-          <Tooltip content={<CustomTooltip />} />
-          <Legend 
-            verticalAlign="bottom" 
+          <Tooltip content={<CustomTooltip viewMode={viewMode} />} />
+          <Legend
+            verticalAlign="bottom"
             height={60}
             formatter={(value, entry) => `${value}`}
           />

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import KPICard from './KPICard';
 import LineChart from './LineChart';
 import BarChart from './BarChart';
+import ProductivityChart from './ProductivityChart';
 import { getPanoramaGeneral } from '../services/api';
 
 /**
@@ -18,7 +19,7 @@ function PanoramaRegional({ region }) {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
-      
+
       try {
         const response = await getPanoramaGeneral(region);
         setData(response);
@@ -111,24 +112,10 @@ function PanoramaRegional({ region }) {
         <div className="chart-container chart-full">
           <h3>📈 Evolución Anual: Cosecha vs. Capacidad de Plantas</h3>
           {data.grafico_anual && data.grafico_anual.length > 0 ? (
-            <LineChart
+            <ProductivityChart
               data={data.grafico_anual}
               title="Comparativa por Año"
               description="Compara la evolución temporal de la cosecha total contra la capacidad instalada de plantas. Identifica tendencias de crecimiento, estacionalidad y correlación entre extracción y procesamiento industrial."
-              multiSeries={true}
-              xKey="año"
-              series={[
-                {
-                  key: 'cosechaTotal',
-                  label: 'Cosecha (Ton)',
-                  color: '#3b82f6'
-                },
-                {
-                  key: 'capacidadPlantas',
-                  label: 'Plantas Activas',
-                  color: '#10b981'
-                }
-              ]}
             />
           ) : (
             <div className="no-data-message">

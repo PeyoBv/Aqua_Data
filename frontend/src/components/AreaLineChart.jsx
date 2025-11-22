@@ -10,20 +10,35 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
+import { calculateValue, formatCurrency, getAxisFormatter } from '../utils/economicCalculator';
 import './ChartDescription.css';
 
 /**
  * Componente de gráfico de área compuesto para Trazabilidad
  * Muestra Desembarque (área) vs Materia Prima (línea)
  */
-const AreaLineChart = ({ data, title, description }) => {
-  
+const AreaLineChart = ({ data, title, description, viewMode, especie }) => {
+
+  // Transform data if viewMode is USD
+  const chartData = React.useMemo(() => {
+    if (viewMode !== 'USD') return data;
+    return data.map(item => ({
+      ...item,
+      desembarque: calculateValue(especie, item.desembarque),
+      materiaPrima: calculateValue(especie, item.materiaPrima)
+    }));
+  }, [data, viewMode, especie]);
+
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const desembarque = payload.find(p => p.dataKey === 'desembarque')?.value || 0;
       const materiaPrima = payload.find(p => p.dataKey === 'materiaPrima')?.value || 0;
       const brecha = desembarque - materiaPrima;
       const porcentaje = desembarque > 0 ? ((materiaPrima / desembarque) * 100).toFixed(1) : 0;
+
+      const isUSD = viewMode === 'USD';
+      const unit = isUSD ? '' : ' Ton';
+      const formatter = isUSD ? formatCurrency : (val) => val.toLocaleString('es-CL');
 
       return (
         <div style={{
@@ -37,16 +52,16 @@ const AreaLineChart = ({ data, title, description }) => {
             Año {payload[0].payload.año}
           </p>
           <p style={{ margin: '4px 0', color: '#3b82f6', fontSize: '13px' }}>
-            🎣 Desembarque: <strong>{desembarque.toLocaleString('es-CL')} ton</strong>
+            {isUSD ? '💰 Valor Desembarque:' : '🎣 Desembarque:'} <strong>{formatter(desembarque)}{unit}</strong>
           </p>
           <p style={{ margin: '4px 0', color: '#10b981', fontSize: '13px' }}>
-            🏭 Materia Prima: <strong>{materiaPrima.toLocaleString('es-CL')} ton</strong>
+            {isUSD ? '💰 Valor Materia Prima:' : '🏭 Materia Prima:'} <strong>{formatter(materiaPrima)}{unit}</strong>
           </p>
           <p style={{ margin: '8px 0 4px 0', color: '#64748b', fontSize: '12px', borderTop: '1px solid #e2e8f0', paddingTop: '6px' }}>
             📊 Procesado: <strong>{porcentaje}%</strong>
           </p>
           <p style={{ margin: '4px 0', color: '#f59e0b', fontSize: '12px' }}>
-            ⚠️ Brecha: <strong>{brecha.toLocaleString('es-CL')} ton</strong>
+            {isUSD ? '💰 Valor Brecha:' : '⚠️ Brecha:'} <strong>{formatter(brecha)}{unit}</strong>
           </p>
         </div>
       );
@@ -61,7 +76,7 @@ const AreaLineChart = ({ data, title, description }) => {
     <div style={{ width: '100%', marginBottom: '20px' }}>
       <h3 className="chart-title">{title}</h3>
       {description && <p className="chart-description">{description}</p>}
-      
+
       {!hasData ? (
         <div style={{
           width: '100%',
@@ -100,51 +115,48 @@ const AreaLineChart = ({ data, title, description }) => {
       ) : (
         <ResponsiveContainer width="100%" height={400}>
           <ComposedChart
-            data={data}
+            data={chartData}
             margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
           >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis 
-            dataKey="año" 
-            stroke="#64748b"
-            style={{ fontSize: '12px' }}
-          />
-          <YAxis 
-            stroke="#64748b"
-            style={{ fontSize: '12px' }}
-            tickFormatter={(value) => {
-              if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
-              if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
-              return value;
-            }}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          <Legend 
-            wrapperStyle={{ paddingTop: '10px' }}
-            iconType="circle"
-          />
-          
-          {/* Área de Desembarque (Oferta) */}
-          <Area
-            type="monotone"
-            dataKey="desembarque"
-            name="Desembarque Total"
-            fill="#3b82f6"
-            fillOpacity={0.3}
-            stroke="#3b82f6"
-            strokeWidth={2}
-          />
-          
-          {/* Línea de Materia Prima (Demanda Industrial) */}
-          <Line
-            type="monotone"
-            dataKey="materiaPrima"
-            name="Materia Prima en Plantas"
-            stroke="#10b981"
-            strokeWidth={3}
-            dot={{ fill: '#10b981', r: 4 }}
-            activeDot={{ r: 6 }}
-          />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+            <XAxis
+              dataKey="año"
+              stroke="#64748b"
+              style={{ fontSize: '12px' }}
+            />
+            <YAxis
+              stroke="#64748b"
+              style={{ fontSize: '12px' }}
+              tickFormatter={getAxisFormatter(viewMode)}
+              width={80}
+            />
+            <Tooltip content={<CustomTooltip viewMode={viewMode} especie={especie} />} />
+            <Legend
+              wrapperStyle={{ paddingTop: '10px' }}
+              iconType="circle"
+            />
+
+            {/* Área de Desembarque (Oferta) */}
+            <Area
+              type="monotone"
+              dataKey="desembarque"
+              name="Desembarque Total"
+              fill="#3b82f6"
+              fillOpacity={0.3}
+              stroke="#3b82f6"
+              strokeWidth={2}
+            />
+
+            {/* Línea de Materia Prima (Demanda Industrial) */}
+            <Line
+              type="monotone"
+              dataKey="materiaPrima"
+              name="Materia Prima en Plantas"
+              stroke="#10b981"
+              strokeWidth={3}
+              dot={{ fill: '#10b981', r: 4 }}
+              activeDot={{ r: 6 }}
+            />
           </ComposedChart>
         </ResponsiveContainer>
       )}

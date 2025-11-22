@@ -1,0 +1,176 @@
+.predicciones-container {
+    padding: 2rem;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    padding: 3rem 2rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
+}
+
+.hero-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    font-weight: 300;
+}
+
+.methodology-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    max-width: 800px;
+}
+
+.methodology-card h3 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.methodology-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.methodology-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.methodology-item .icon {
+    font-size: 1.5rem;
+}
+
+.methodology-item p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Species Selector */
+.species-selector-section {
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.species-chip {
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.95rem;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.species-chip:hover {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.species-chip.active {
+    background-color: #2563eb;
+    color: white;
+    border-color: #2563eb;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.4);
+}
+
+/* Chart Section */
+.chart-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    min-height: 500px;
+}
+
+/* How It Works Card */
+.how-it-works-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    border-left: 5px solid #f59e0b;
+    /* Amber accent */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    color: #1f2937;
+}
+
+.how-it-works-card h3 {
+    font-size: 1.1rem;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.how-it-works-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.how-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.how-item .icon {
+    font-size: 1.5rem;
+    background: #eff6ff;
+    padding: 0.5rem;
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.how-item p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+    color: #4b5563;
+}
+
+.how-item strong {
+    color: #1e3a8a;
+    display: block;
+    margin-bottom: 0.25rem;
+}

@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   Cell
 } from 'recharts';
+import { calculateValue, formatCurrency, getAxisFormatter } from '../utils/economicCalculator';
 import './ChartDescription.css';
 
 /**
@@ -17,8 +18,8 @@ import './ChartDescription.css';
  * Muestra barras comparativas entre dos años específicos
  * Incluye KPI de variación porcentual
  */
-const YearComparisonChart = ({ data, yearA, yearB, especie }) => {
-  
+const YearComparisonChart = ({ data, yearA, yearB, especie, viewMode }) => {
+
   // Validar datos
   if (!data || !data.dataYearA || !data.dataYearB) {
     return (
@@ -33,16 +34,25 @@ const YearComparisonChart = ({ data, yearA, yearB, especie }) => {
   // ========================================
   // PREPARACIÓN DE DATOS PARA BARRAS AGRUPADAS
   // ========================================
+  const isUSD = viewMode === 'USD';
+  const unit = isUSD ? '' : ' Ton';
+  const formatter = isUSD ? formatCurrency : (val) => val.toLocaleString('es-CL');
+
+  const valA_Captura = isUSD ? calculateValue(especie, dataYearA.captura) : dataYearA.captura;
+  const valB_Captura = isUSD ? calculateValue(especie, dataYearB.captura) : dataYearB.captura;
+  const valA_Procesamiento = isUSD ? calculateValue(especie, dataYearA.procesamiento) : dataYearA.procesamiento;
+  const valB_Procesamiento = isUSD ? calculateValue(especie, dataYearB.procesamiento) : dataYearB.procesamiento;
+
   const chartData = [
     {
       categoria: 'Captura',
-      [`${yearA}`]: Math.round(dataYearA.captura),
-      [`${yearB}`]: Math.round(dataYearB.captura)
+      [`${yearA}`]: Math.round(valA_Captura),
+      [`${yearB}`]: Math.round(valB_Captura)
     },
     {
       categoria: 'Procesamiento',
-      [`${yearA}`]: Math.round(dataYearA.procesamiento),
-      [`${yearB}`]: Math.round(dataYearB.procesamiento)
+      [`${yearA}`]: Math.round(valA_Procesamiento),
+      [`${yearB}`]: Math.round(valB_Procesamiento)
     }
   ];
 
@@ -54,8 +64,8 @@ const YearComparisonChart = ({ data, yearA, yearB, especie }) => {
     return ((valorB - valorA) / valorA) * 100;
   };
 
-  const variacionCaptura = calcularVariacion(dataYearA.captura, dataYearB.captura);
-  const variacionProcesamiento = calcularVariacion(dataYearA.procesamiento, dataYearB.procesamiento);
+  const variacionCaptura = calcularVariacion(valA_Captura, valB_Captura);
+  const variacionProcesamiento = calcularVariacion(valA_Procesamiento, valB_Procesamiento);
 
   // ========================================
   // COLORES
@@ -89,13 +99,13 @@ const YearComparisonChart = ({ data, yearA, yearB, especie }) => {
             📊 {label}
           </p>
           <p style={{ margin: '5px 0', color: COLORS.YEAR_A, fontSize: '13px' }}>
-            <strong>{yearA}:</strong> {valorA.toLocaleString('es-CL')} ton
+            <strong>{yearA}:</strong> {formatter(valorA)}{unit}
           </p>
           <p style={{ margin: '5px 0', color: COLORS.YEAR_B, fontSize: '13px' }}>
-            <strong>{yearB}:</strong> {valorB.toLocaleString('es-CL')} ton
+            <strong>{yearB}:</strong> {formatter(valorB)}{unit}
           </p>
-          <p style={{ 
-            margin: '8px 0 0 0', 
+          <p style={{
+            margin: '8px 0 0 0',
             color: variacion >= 0 ? COLORS.POSITIVE : COLORS.NEGATIVE,
             fontSize: '13px',
             fontWeight: 'bold'
@@ -113,19 +123,19 @@ const YearComparisonChart = ({ data, yearA, yearB, especie }) => {
   // ========================================
   const renderCustomLabel = (props) => {
     const { x, y, width, value, index } = props;
-    
+
     // Solo mostrar en la segunda barra (yearB)
     if (index % 2 !== 1) return null;
 
     const categoria = index < 2 ? 'Captura' : 'Procesamiento';
-    const valorA = categoria === 'Captura' ? dataYearA.captura : dataYearA.procesamiento;
-    const valorB = categoria === 'Captura' ? dataYearB.captura : dataYearB.procesamiento;
+    const valorA = categoria === 'Captura' ? valA_Captura : valA_Procesamiento;
+    const valorB = categoria === 'Captura' ? valB_Captura : valB_Procesamiento;
     const variacion = calcularVariacion(valorA, valorB);
 
     return (
-      <text 
-        x={x + width / 2} 
-        y={y - 10} 
+      <text
+        x={x + width / 2}
+        y={y - 10}
         fill={variacion >= 0 ? COLORS.POSITIVE : COLORS.NEGATIVE}
         textAnchor="middle"
         fontSize="13px"
@@ -143,8 +153,8 @@ const YearComparisonChart = ({ data, yearA, yearB, especie }) => {
         📈 Comparación Anual: {yearA} vs {yearB}
       </h3>
       <p className="chart-description">
-        Análisis Year-over-Year (YoY) de {especie}. Compara los volúmenes totales de captura y procesamiento 
-        entre {yearA} (gris) y {yearB} (azul). Los porcentajes verdes/rojos indican el crecimiento o decrecimiento 
+        Análisis Year-over-Year (YoY) de {especie}. Compara los volúmenes totales de captura y procesamiento
+        entre {yearA} (gris) y {yearB} (azul). Los porcentajes verdes/rojos indican el crecimiento o decrecimiento
         respecto al año anterior.
       </p>
 
@@ -155,36 +165,35 @@ const YearComparisonChart = ({ data, yearA, yearB, especie }) => {
           margin={{ top: 40, right: 30, left: 20, bottom: 20 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis 
-            dataKey="categoria" 
+          <XAxis
+            dataKey="categoria"
             tick={{ fill: '#64748b', fontSize: 14, fontWeight: '600' }}
             axisLine={{ stroke: '#cbd5e1' }}
             tickLine={{ stroke: '#cbd5e1' }}
           />
-          <YAxis 
-            tick={{ fill: '#64748b', fontSize: 12 }}
-            axisLine={{ stroke: '#cbd5e1' }}
-            label={{ 
-              value: 'Toneladas', 
-              angle: -90, 
+          <YAxis
+            tickFormatter={getAxisFormatter(viewMode)}
+            label={{
+              value: viewMode === 'USD' ? 'Valor (USD)' : 'Toneladas',
+              angle: -90,
               position: 'insideLeft',
               style: { fill: '#64748b', fontSize: 13 }
             }}
           />
-          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.05)' }} />
-          <Legend 
+          <Tooltip content={<CustomTooltip viewMode={viewMode} />} cursor={{ fill: 'rgba(0,0,0,0.05)' }} />
+          <Legend
             wrapperStyle={{ paddingTop: '20px' }}
             iconType="rect"
           />
-          <Bar 
-            dataKey={`${yearA}`} 
-            fill={COLORS.YEAR_A} 
+          <Bar
+            dataKey={`${yearA}`}
+            fill={COLORS.YEAR_A}
             radius={[8, 8, 0, 0]}
             barSize={80}
           />
-          <Bar 
-            dataKey={`${yearB}`} 
-            fill={COLORS.YEAR_B} 
+          <Bar
+            dataKey={`${yearB}`}
+            fill={COLORS.YEAR_B}
             radius={[8, 8, 0, 0]}
             barSize={80}
             label={renderCustomLabel}
@@ -193,8 +202,8 @@ const YearComparisonChart = ({ data, yearA, yearB, especie }) => {
       </ResponsiveContainer>
 
       {/* KPIs DE VARIACIÓN */}
-      <div style={{ 
-        display: 'grid', 
+      <div style={{
+        display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
         gap: '16px',
         marginTop: '24px'
@@ -207,17 +216,17 @@ const YearComparisonChart = ({ data, yearA, yearB, especie }) => {
           border: '1px solid #e2e8f0'
         }}>
           <div style={{ fontSize: '13px', color: '#64748b', marginBottom: '8px' }}>
-            🎣 Variación en Captura
+            {isUSD ? '💰 Variación en Valor Captura' : '🎣 Variación en Captura'}
           </div>
-          <div style={{ 
-            fontSize: '28px', 
-            fontWeight: 'bold', 
-            color: variacionCaptura >= 0 ? COLORS.POSITIVE : COLORS.NEGATIVE 
+          <div style={{
+            fontSize: '28px',
+            fontWeight: 'bold',
+            color: variacionCaptura >= 0 ? COLORS.POSITIVE : COLORS.NEGATIVE
           }}>
             {variacionCaptura >= 0 ? '+' : ''}{variacionCaptura.toFixed(1)}%
           </div>
           <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>
-            {dataYearA.captura.toLocaleString('es-CL')} ton ({yearA}) → {dataYearB.captura.toLocaleString('es-CL')} ton ({yearB})
+            {formatter(valA_Captura)}{unit} ({yearA}) → {formatter(valB_Captura)}{unit} ({yearB})
           </div>
         </div>
 
@@ -229,17 +238,17 @@ const YearComparisonChart = ({ data, yearA, yearB, especie }) => {
           border: '1px solid #e2e8f0'
         }}>
           <div style={{ fontSize: '13px', color: '#64748b', marginBottom: '8px' }}>
-            🏭 Variación en Procesamiento
+            {isUSD ? '💰 Variación en Valor Procesamiento' : '🏭 Variación en Procesamiento'}
           </div>
-          <div style={{ 
-            fontSize: '28px', 
-            fontWeight: 'bold', 
-            color: variacionProcesamiento >= 0 ? COLORS.POSITIVE : COLORS.NEGATIVE 
+          <div style={{
+            fontSize: '28px',
+            fontWeight: 'bold',
+            color: variacionProcesamiento >= 0 ? COLORS.POSITIVE : COLORS.NEGATIVE
           }}>
             {variacionProcesamiento >= 0 ? '+' : ''}{variacionProcesamiento.toFixed(1)}%
           </div>
           <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>
-            {dataYearA.procesamiento.toLocaleString('es-CL')} ton ({yearA}) → {dataYearB.procesamiento.toLocaleString('es-CL')} ton ({yearB})
+            {formatter(valA_Procesamiento)}{unit} ({yearA}) → {formatter(valB_Procesamiento)}{unit} ({yearB})
           </div>
         </div>
       </div>

@@ -8,6 +8,7 @@ import RegionalBalanceChart from './RegionalBalanceChart';
 import YearComparisonChart from './YearComparisonChart';
 import SeasonalityHeatmap from './SeasonalityHeatmap';
 import { getEspeciesDisponibles, getTrazabilidad, getMatrizDestino, getEvolucionDestino, getComparacionRegional, getComparacionYoY, getMatrizEstacionalidad } from '../services/comparadorApi';
+import ForecastChart from './ForecastChart';
 import { generateTrazabilidadPDF } from '../utils/pdfGenerator';
 import './Comparador.css';
 
@@ -31,7 +32,7 @@ function Comparador({ region }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [generatingPDF, setGeneratingPDF] = useState(false);
-  
+
   // Referencia al contenedor de gráficos para captura de pantalla
   const chartsContainerRef = useRef(null);
 
@@ -42,7 +43,7 @@ function Comparador({ region }) {
         console.log('🔍 Cargando especies disponibles del comparador...');
         const response = await getEspeciesDisponibles();
         console.log('✅ Respuesta de especies:', response);
-        
+
         if (response.success && response.especies && response.especies.length > 0) {
           setEspecies(response.especies);
           setEspecieSeleccionada(response.especies[0]); // Seleccionar la primera por defecto
@@ -71,8 +72,15 @@ function Comparador({ region }) {
       setLoading(true);
       setError(null);
 
+      // 🛑 RESET STATES to avoid stale data (ghosting)
+      setDataTrazabilidad(null);
+      setDataMatrizDestino(null);
+      setDataEvolucionDestino(null);
+      setDataComparacionRegional(null);
+      setDataEstacionalidad(null);
+
       try {
-        const params = { 
+        const params = {
           especie: especieSeleccionada,
           region: region === 'TODAS' ? 'TODAS' : region
         };
@@ -83,37 +91,50 @@ function Comparador({ region }) {
           getTrazabilidad(params),
           getMatrizDestino(params),
           getEvolucionDestino(params),
-          getComparacionRegional({ 
-            especie: especieSeleccionada, 
+          getComparacionRegional({
+            especie: especieSeleccionada,
             year: añoSeleccionado,
-            region: region === 'TODAS' ? 'TODAS' : region  // ✅ Filtro global de región
+            region: region === 'TODAS' ? 'TODAS' : region
           }),
-          getMatrizEstacionalidad({ 
-            especie: especieSeleccionada, 
-            region: region === 'TODAS' ? 'TODAS' : region 
+          getMatrizEstacionalidad({
+            especie: especieSeleccionada,
+            region: region === 'TODAS' ? 'TODAS' : region
           })
         ]);
 
+        // ✅ Trazabilidad (Siempre devuelve data, incluso con ceros)
         if (trazabilidad.success) {
           setDataTrazabilidad(trazabilidad);
         } else {
           setError('Error al cargar datos de trazabilidad');
         }
 
+        // ✅ Matriz Destino
         if (matrizDestino.success) {
           setDataMatrizDestino(matrizDestino);
+        } else {
+          setDataMatrizDestino({ success: false, destinos: [] }); // Clear if fail
         }
 
+        // ✅ Evolución Destino
         if (evolucionDestino.success) {
           setDataEvolucionDestino(evolucionDestino);
+        } else {
+          setDataEvolucionDestino({ success: false, data: [] }); // Clear if fail
         }
 
+        // ✅ Comparación Regional
         if (comparacionRegional.success) {
           setDataComparacionRegional(comparacionRegional);
+        } else {
+          setDataComparacionRegional({ success: false, data: [] }); // Clear if fail
         }
 
+        // ✅ Estacionalidad
         if (estacionalidad.success) {
           setDataEstacionalidad(estacionalidad);
+        } else {
+          setDataEstacionalidad({ success: false, data: [] }); // Clear if fail
         }
 
       } catch (err) {
@@ -246,7 +267,7 @@ function Comparador({ region }) {
               Analiza la cadena de suministro cruzando datos de pesca (oferta) con procesamiento industrial (demanda)
             </p>
           </div>
-          
+
           {/* Botón de Descarga PDF */}
           {dataTrazabilidad && (
             <button
@@ -321,34 +342,69 @@ function Comparador({ region }) {
         <>
           {/* KPIs de Trazabilidad */}
           <div className="kpis-grid">
-            <KPICard
-              title="Total Desembarcado"
-              value={`${dataTrazabilidad.estadisticas.totalDesembarque.toLocaleString('es-CL')} ton`}
-              icon="🎣"
-              color="#3b82f6"
-              description={`Oferta total de ${especieSeleccionada} (2010-2024)`}
-            />
-            <KPICard
-              title="Materia Prima Industrial"
-              value={`${dataTrazabilidad.estadisticas.totalMateriaPrima.toLocaleString('es-CL')} ton`}
-              icon="🏭"
-              color="#10b981"
-              description="Volumen que ingresa a plantas de procesamiento"
-            />
-            <KPICard
-              title="% Procesado Industrialmente"
-              value={`${dataTrazabilidad.estadisticas.porcentajeProcesado}%`}
-              icon="📊"
-              color="#8b5cf6"
-              description="¿Cuánto de la captura entra a plantas?"
-            />
-            <KPICard
-              title="Otros Destinos"
-              value={`${dataTrazabilidad.estadisticas.totalBrecha.toLocaleString('es-CL')} ton`}
-              icon="⚠️"
-              color="#f59e0b"
-              description="Consumo fresco, exportación directa, harina artesanal"
-            />
+            {(() => {
+              // Lógica para calcular KPIs dinámicos según el año seleccionado
+              let kpiData = {
+                desembarque: dataTrazabilidad.estadisticas.totalDesembarque,
+                materiaPrima: dataTrazabilidad.estadisticas.totalMateriaPrima,
+                procesado: dataTrazabilidad.estadisticas.porcentajeProcesado,
+                brecha: dataTrazabilidad.estadisticas.totalBrecha,
+                periodo: '2010-2024'
+              };
+
+              if (añoSeleccionado !== 'TODOS') {
+                const yearData = dataTrazabilidad.data.find(d => d.año === parseInt(añoSeleccionado));
+                if (yearData) {
+                  const desembarque = yearData.desembarque || 0;
+                  const materiaPrima = yearData.materiaPrima || 0;
+                  const brecha = yearData.brecha || 0;
+                  const procesado = desembarque > 0
+                    ? ((materiaPrima / desembarque) * 100).toFixed(1)
+                    : 0;
+
+                  kpiData = {
+                    desembarque,
+                    materiaPrima,
+                    procesado,
+                    brecha,
+                    periodo: añoSeleccionado
+                  };
+                }
+              }
+
+              return (
+                <>
+                  <KPICard
+                    title="Total Desembarcado"
+                    value={`${kpiData.desembarque.toLocaleString('es-CL')} ton`}
+                    icon="🎣"
+                    color="#3b82f6"
+                    description={`Oferta total de ${especieSeleccionada} (${kpiData.periodo})`}
+                  />
+                  <KPICard
+                    title="Materia Prima Industrial"
+                    value={`${kpiData.materiaPrima.toLocaleString('es-CL')} ton`}
+                    icon="🏭"
+                    color="#10b981"
+                    description={`Volumen que ingresa a plantas (${kpiData.periodo})`}
+                  />
+                  <KPICard
+                    title="% Procesado Industrialmente"
+                    value={`${kpiData.procesado}%`}
+                    icon="📊"
+                    color="#8b5cf6"
+                    description={`¿Cuánto de la captura entra a plantas?`}
+                  />
+                  <KPICard
+                    title="Otros Destinos"
+                    value={`${kpiData.brecha.toLocaleString('es-CL')} ton`}
+                    icon="⚠️"
+                    color="#f59e0b"
+                    description="Consumo fresco, exportación directa, harina artesanal"
+                  />
+                </>
+              );
+            })()}
           </div>
 
           {/* Fila Inferior: Evolución del Destino (Izquierda) + Comparación Regional (Derecha) */}
@@ -391,13 +447,13 @@ function Comparador({ region }) {
 
           {/* Contenedor para captura PDF - Incluye gráficos y análisis */}
           <div ref={chartsContainerRef} className="charts-section pdf-capture-area">
-            
+
             {/* GRÁFICO PRINCIPAL: Tendencia Histórica o Comparación YoY */}
             <div className="chart-container chart-full">
               {/* SWITCH DE MODO */}
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
                 alignItems: 'center',
                 marginBottom: '16px',
                 padding: '12px',
@@ -514,7 +570,7 @@ function Comparador({ region }) {
                   <div className="chart-container chart-half">
                     <RegionalBalanceChart
                       data={dataComparacionRegional.data}
-                      title={añoSeleccionado === 'TODOS' 
+                      title={añoSeleccionado === 'TODOS'
                         ? 'Balance Regional Acumulado (2010-2024)'
                         : `Balance Regional (${añoSeleccionado})`}
                       description={`Balance entre captura (azul) y procesamiento (verde) de ${especieSeleccionada} por región${añoSeleccionado !== 'TODOS' ? ` en el año ${añoSeleccionado}` : ' en el período 2010-2024'}. Las barras horizontales facilitan la lectura de nombres de regiones. Identifica oportunidades de integración vertical y eficiencias en la cadena de suministro.`}
@@ -534,7 +590,7 @@ function Comparador({ region }) {
                   <p className="chart-description">
                     Análisis del flujo de {especieSeleccionada} desde la captura hasta el consumo final
                   </p>
-                  
+
                   <div className="insight-card">
                     <div className="insight-header">
                       <span className="insight-icon">🏭</span>
@@ -544,7 +600,7 @@ function Comparador({ region }) {
                       {dataTrazabilidad.estadisticas.porcentajeProcesado}% de la captura
                     </div>
                     <p className="insight-detail">
-                      {dataTrazabilidad.estadisticas.totalMateriaPrima.toLocaleString('es-CL')} toneladas 
+                      {dataTrazabilidad.estadisticas.totalMateriaPrima.toLocaleString('es-CL')} toneladas
                       ingresan a plantas de elaboración para producir congelados, conservas, harina y aceite.
                     </p>
                   </div>
@@ -558,7 +614,7 @@ function Comparador({ region }) {
                       {dataTrazabilidad.estadisticas.porcentajeOtrosDestinos}% de la captura
                     </div>
                     <p className="insight-detail">
-                      {dataTrazabilidad.estadisticas.totalBrecha.toLocaleString('es-CL')} toneladas 
+                      {dataTrazabilidad.estadisticas.totalBrecha.toLocaleString('es-CL')} toneladas
                       se destinan a consumo humano directo, exportación sin procesar, harina artesanal u otros usos.
                     </p>
                   </div>
@@ -570,7 +626,7 @@ function Comparador({ region }) {
                         <strong>Alerta de Baja Industrialización</strong>
                       </div>
                       <p className="insight-detail">
-                        Menos del 50% de la captura de {especieSeleccionada} ingresa a plantas industriales. 
+                        Menos del 50% de la captura de {especieSeleccionada} ingresa a plantas industriales.
                         Esto puede indicar exportación directa, consumo fresco o procesamiento artesanal predominante.
                       </p>
                     </div>
@@ -583,7 +639,7 @@ function Comparador({ region }) {
                         <strong>Alta Integración Industrial</strong>
                       </div>
                       <p className="insight-detail">
-                        Más del 80% de {especieSeleccionada} se procesa industrialmente, 
+                        Más del 80% de {especieSeleccionada} se procesa industrialmente,
                         indicando una cadena de suministro bien integrada con la industria de elaboración.
                       </p>
                     </div>
@@ -594,6 +650,14 @@ function Comparador({ region }) {
           </div>
         </>
       )}
+
+      {/* SECCIÓN DE PROYECCIÓN (Siempre visible si hay datos) */}
+      <div className="chart-container chart-full" style={{ marginTop: '24px' }}>
+        <ForecastChart
+          species={especieSeleccionada}
+          region={region === 'TODAS' ? 'TODAS' : region}
+        />
+      </div>
     </div>
   );
 }

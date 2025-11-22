@@ -1,0 +1,1622 @@
+[
+  {
+    "date": "2000-01-01",
+    "value": 9894,
+    "type": "history"
+  },
+  {
+    "date": "2000-02-01",
+    "value": 11050,
+    "type": "history"
+  },
+  {
+    "date": "2000-03-01",
+    "value": 11084,
+    "type": "history"
+  },
+  {
+    "date": "2000-04-01",
+    "value": 11270,
+    "type": "history"
+  },
+  {
+    "date": "2000-05-01",
+    "value": 13584,
+    "type": "history"
+  },
+  {
+    "date": "2000-06-01",
+    "value": 13773,
+    "type": "history"
+  },
+  {
+    "date": "2000-07-01",
+    "value": 15091,
+    "type": "history"
+  },
+  {
+    "date": "2000-08-01",
+    "value": 17265,
+    "type": "history"
+  },
+  {
+    "date": "2000-09-01",
+    "value": 15535,
+    "type": "history"
+  },
+  {
+    "date": "2000-10-01",
+    "value": 16703,
+    "type": "history"
+  },
+  {
+    "date": "2000-11-01",
+    "value": 17405,
+    "type": "history"
+  },
+  {
+    "date": "2000-12-01",
+    "value": 14243,
+    "type": "history"
+  },
+  {
+    "date": "2001-01-01",
+    "value": 16592,
+    "type": "history"
+  },
+  {
+    "date": "2001-02-01",
+    "value": 18352,
+    "type": "history"
+  },
+  {
+    "date": "2001-03-01",
+    "value": 25533,
+    "type": "history"
+  },
+  {
+    "date": "2001-04-01",
+    "value": 20121,
+    "type": "history"
+  },
+  {
+    "date": "2001-05-01",
+    "value": 22096,
+    "type": "history"
+  },
+  {
+    "date": "2001-06-01",
+    "value": 21866,
+    "type": "history"
+  },
+  {
+    "date": "2001-07-01",
+    "value": 19165,
+    "type": "history"
+  },
+  {
+    "date": "2001-08-01",
+    "value": 23515,
+    "type": "history"
+  },
+  {
+    "date": "2001-09-01",
+    "value": 18529,
+    "type": "history"
+  },
+  {
+    "date": "2001-10-01",
+    "value": 23896,
+    "type": "history"
+  },
+  {
+    "date": "2001-11-01",
+    "value": 23322,
+    "type": "history"
+  },
+  {
+    "date": "2001-12-01",
+    "value": 20863,
+    "type": "history"
+  },
+  {
+    "date": "2002-01-01",
+    "value": 24718,
+    "type": "history"
+  },
+  {
+    "date": "2002-02-01",
+    "value": 24547,
+    "type": "history"
+  },
+  {
+    "date": "2002-03-01",
+    "value": 26595,
+    "type": "history"
+  },
+  {
+    "date": "2002-04-01",
+    "value": 18348,
+    "type": "history"
+  },
+  {
+    "date": "2002-05-01",
+    "value": 18963,
+    "type": "history"
+  },
+  {
+    "date": "2002-06-01",
+    "value": 19936,
+    "type": "history"
+  },
+  {
+    "date": "2002-07-01",
+    "value": 21238,
+    "type": "history"
+  },
+  {
+    "date": "2002-08-01",
+    "value": 21111,
+    "type": "history"
+  },
+  {
+    "date": "2002-09-01",
+    "value": 21813,
+    "type": "history"
+  },
+  {
+    "date": "2002-10-01",
+    "value": 22862,
+    "type": "history"
+  },
+  {
+    "date": "2002-11-01",
+    "value": 21336,
+    "type": "history"
+  },
+  {
+    "date": "2002-12-01",
+    "value": 24259,
+    "type": "history"
+  },
+  {
+    "date": "2003-01-01",
+    "value": 22856,
+    "type": "history"
+  },
+  {
+    "date": "2003-02-01",
+    "value": 21906,
+    "type": "history"
+  },
+  {
+    "date": "2003-03-01",
+    "value": 23236,
+    "type": "history"
+  },
+  {
+    "date": "2003-04-01",
+    "value": 21964,
+    "type": "history"
+  },
+  {
+    "date": "2003-05-01",
+    "value": 20758,
+    "type": "history"
+  },
+  {
+    "date": "2003-06-01",
+    "value": 20611,
+    "type": "history"
+  },
+  {
+    "date": "2003-07-01",
+    "value": 22593,
+    "type": "history"
+  },
+  {
+    "date": "2003-08-01",
+    "value": 23473,
+    "type": "history"
+  },
+  {
+    "date": "2003-09-01",
+    "value": 22828,
+    "type": "history"
+  },
+  {
+    "date": "2003-10-01",
+    "value": 26825,
+    "type": "history"
+  },
+  {
+    "date": "2003-11-01",
+    "value": 26344,
+    "type": "history"
+  },
+  {
+    "date": "2003-12-01",
+    "value": 26907,
+    "type": "history"
+  },
+  {
+    "date": "2004-01-01",
+    "value": 29522,
+    "type": "history"
+  },
+  {
+    "date": "2004-02-01",
+    "value": 29782,
+    "type": "history"
+  },
+  {
+    "date": "2004-03-01",
+    "value": 30236,
+    "type": "history"
+  },
+  {
+    "date": "2004-04-01",
+    "value": 26518,
+    "type": "history"
+  },
+  {
+    "date": "2004-05-01",
+    "value": 25247,
+    "type": "history"
+  },
+  {
+    "date": "2004-06-01",
+    "value": 25230,
+    "type": "history"
+  },
+  {
+    "date": "2004-07-01",
+    "value": 24353,
+    "type": "history"
+  },
+  {
+    "date": "2004-08-01",
+    "value": 26399,
+    "type": "history"
+  },
+  {
+    "date": "2004-09-01",
+    "value": 32902,
+    "type": "history"
+  },
+  {
+    "date": "2004-10-01",
+    "value": 31115,
+    "type": "history"
+  },
+  {
+    "date": "2004-11-01",
+    "value": 33775,
+    "type": "history"
+  },
+  {
+    "date": "2004-12-01",
+    "value": 34004,
+    "type": "history"
+  },
+  {
+    "date": "2005-01-01",
+    "value": 34183,
+    "type": "history"
+  },
+  {
+    "date": "2005-02-01",
+    "value": 32094,
+    "type": "history"
+  },
+  {
+    "date": "2005-03-01",
+    "value": 32550,
+    "type": "history"
+  },
+  {
+    "date": "2005-04-01",
+    "value": 31645,
+    "type": "history"
+  },
+  {
+    "date": "2005-05-01",
+    "value": 31031,
+    "type": "history"
+  },
+  {
+    "date": "2005-06-01",
+    "value": 30377,
+    "type": "history"
+  },
+  {
+    "date": "2005-07-01",
+    "value": 29648,
+    "type": "history"
+  },
+  {
+    "date": "2005-08-01",
+    "value": 32844,
+    "type": "history"
+  },
+  {
+    "date": "2005-09-01",
+    "value": 29569,
+    "type": "history"
+  },
+  {
+    "date": "2005-10-01",
+    "value": 32610,
+    "type": "history"
+  },
+  {
+    "date": "2005-11-01",
+    "value": 37555,
+    "type": "history"
+  },
+  {
+    "date": "2005-12-01",
+    "value": 31673,
+    "type": "history"
+  },
+  {
+    "date": "2006-01-01",
+    "value": 27563,
+    "type": "history"
+  },
+  {
+    "date": "2006-02-01",
+    "value": 26394,
+    "type": "history"
+  },
+  {
+    "date": "2006-03-01",
+    "value": 33256,
+    "type": "history"
+  },
+  {
+    "date": "2006-04-01",
+    "value": 25760,
+    "type": "history"
+  },
+  {
+    "date": "2006-05-01",
+    "value": 34383,
+    "type": "history"
+  },
+  {
+    "date": "2006-06-01",
+    "value": 32134,
+    "type": "history"
+  },
+  {
+    "date": "2006-07-01",
+    "value": 27617,
+    "type": "history"
+  },
+  {
+    "date": "2006-08-01",
+    "value": 32414,
+    "type": "history"
+  },
+  {
+    "date": "2006-09-01",
+    "value": 32198,
+    "type": "history"
+  },
+  {
+    "date": "2006-10-01",
+    "value": 32925,
+    "type": "history"
+  },
+  {
+    "date": "2006-11-01",
+    "value": 36929,
+    "type": "history"
+  },
+  {
+    "date": "2006-12-01",
+    "value": 34903,
+    "type": "history"
+  },
+  {
+    "date": "2007-01-01",
+    "value": 26797,
+    "type": "history"
+  },
+  {
+    "date": "2007-02-01",
+    "value": 26911,
+    "type": "history"
+  },
+  {
+    "date": "2007-03-01",
+    "value": 27122,
+    "type": "history"
+  },
+  {
+    "date": "2007-04-01",
+    "value": 24430,
+    "type": "history"
+  },
+  {
+    "date": "2007-05-01",
+    "value": 28308,
+    "type": "history"
+  },
+  {
+    "date": "2007-06-01",
+    "value": 28341,
+    "type": "history"
+  },
+  {
+    "date": "2007-07-01",
+    "value": 25628,
+    "type": "history"
+  },
+  {
+    "date": "2007-08-01",
+    "value": 25469,
+    "type": "history"
+  },
+  {
+    "date": "2007-09-01",
+    "value": 25670,
+    "type": "history"
+  },
+  {
+    "date": "2007-10-01",
+    "value": 29844,
+    "type": "history"
+  },
+  {
+    "date": "2007-11-01",
+    "value": 35855,
+    "type": "history"
+  },
+  {
+    "date": "2007-12-01",
+    "value": 26667,
+    "type": "history"
+  },
+  {
+    "date": "2008-01-01",
+    "value": 23749,
+    "type": "history"
+  },
+  {
+    "date": "2008-02-01",
+    "value": 24929,
+    "type": "history"
+  },
+  {
+    "date": "2008-03-01",
+    "value": 28940,
+    "type": "history"
+  },
+  {
+    "date": "2008-04-01",
+    "value": 32124,
+    "type": "history"
+  },
+  {
+    "date": "2008-05-01",
+    "value": 30469,
+    "type": "history"
+  },
+  {
+    "date": "2008-06-01",
+    "value": 27425,
+    "type": "history"
+  },
+  {
+    "date": "2008-07-01",
+    "value": 30027,
+    "type": "history"
+  },
+  {
+    "date": "2008-08-01",
+    "value": 35882,
+    "type": "history"
+  },
+  {
+    "date": "2008-09-01",
+    "value": 35257,
+    "type": "history"
+  },
+  {
+    "date": "2008-10-01",
+    "value": 34479,
+    "type": "history"
+  },
+  {
+    "date": "2008-11-01",
+    "value": 38653,
+    "type": "history"
+  },
+  {
+    "date": "2008-12-01",
+    "value": 46913,
+    "type": "history"
+  },
+  {
+    "date": "2009-01-01",
+    "value": 41467,
+    "type": "history"
+  },
+  {
+    "date": "2009-02-01",
+    "value": 27319,
+    "type": "history"
+  },
+  {
+    "date": "2009-03-01",
+    "value": 25391,
+    "type": "history"
+  },
+  {
+    "date": "2009-04-01",
+    "value": 14869,
+    "type": "history"
+  },
+  {
+    "date": "2009-05-01",
+    "value": 13842,
+    "type": "history"
+  },
+  {
+    "date": "2009-06-01",
+    "value": 15104,
+    "type": "history"
+  },
+  {
+    "date": "2009-07-01",
+    "value": 13252,
+    "type": "history"
+  },
+  {
+    "date": "2009-08-01",
+    "value": 9904,
+    "type": "history"
+  },
+  {
+    "date": "2009-09-01",
+    "value": 8812,
+    "type": "history"
+  },
+  {
+    "date": "2009-10-01",
+    "value": 9712,
+    "type": "history"
+  },
+  {
+    "date": "2009-11-01",
+    "value": 14126,
+    "type": "history"
+  },
+  {
+    "date": "2009-12-01",
+    "value": 10215,
+    "type": "history"
+  },
+  {
+    "date": "2010-01-01",
+    "value": 9814,
+    "type": "history"
+  },
+  {
+    "date": "2010-02-01",
+    "value": 9386,
+    "type": "history"
+  },
+  {
+    "date": "2010-03-01",
+    "value": 10984,
+    "type": "history"
+  },
+  {
+    "date": "2010-04-01",
+    "value": 11175,
+    "type": "history"
+  },
+  {
+    "date": "2010-05-01",
+    "value": 8414,
+    "type": "history"
+  },
+  {
+    "date": "2010-06-01",
+    "value": 7856,
+    "type": "history"
+  },
+  {
+    "date": "2010-07-01",
+    "value": 8612,
+    "type": "history"
+  },
+  {
+    "date": "2010-08-01",
+    "value": 10187,
+    "type": "history"
+  },
+  {
+    "date": "2010-09-01",
+    "value": 9726,
+    "type": "history"
+  },
+  {
+    "date": "2010-10-01",
+    "value": 11691,
+    "type": "history"
+  },
+  {
+    "date": "2010-11-01",
+    "value": 13162,
+    "type": "history"
+  },
+  {
+    "date": "2010-12-01",
+    "value": 12226,
+    "type": "history"
+  },
+  {
+    "date": "2011-01-01",
+    "value": 14282,
+    "type": "history"
+  },
+  {
+    "date": "2011-02-01",
+    "value": 12512,
+    "type": "history"
+  },
+  {
+    "date": "2011-03-01",
+    "value": 17436,
+    "type": "history"
+  },
+  {
+    "date": "2011-04-01",
+    "value": 17314,
+    "type": "history"
+  },
+  {
+    "date": "2011-05-01",
+    "value": 22662,
+    "type": "history"
+  },
+  {
+    "date": "2011-06-01",
+    "value": 24319,
+    "type": "history"
+  },
+  {
+    "date": "2011-07-01",
+    "value": 24815,
+    "type": "history"
+  },
+  {
+    "date": "2011-08-01",
+    "value": 27417,
+    "type": "history"
+  },
+  {
+    "date": "2011-09-01",
+    "value": 26031,
+    "type": "history"
+  },
+  {
+    "date": "2011-10-01",
+    "value": 25396,
+    "type": "history"
+  },
+  {
+    "date": "2011-11-01",
+    "value": 26013,
+    "type": "history"
+  },
+  {
+    "date": "2011-12-01",
+    "value": 26157,
+    "type": "history"
+  },
+  {
+    "date": "2012-01-01",
+    "value": 24675,
+    "type": "history"
+  },
+  {
+    "date": "2012-02-01",
+    "value": 26491,
+    "type": "history"
+  },
+  {
+    "date": "2012-03-01",
+    "value": 32550,
+    "type": "history"
+  },
+  {
+    "date": "2012-04-01",
+    "value": 32424,
+    "type": "history"
+  },
+  {
+    "date": "2012-05-01",
+    "value": 35902,
+    "type": "history"
+  },
+  {
+    "date": "2012-06-01",
+    "value": 34043,
+    "type": "history"
+  },
+  {
+    "date": "2012-07-01",
+    "value": 37995,
+    "type": "history"
+  },
+  {
+    "date": "2012-08-01",
+    "value": 33531,
+    "type": "history"
+  },
+  {
+    "date": "2012-09-01",
+    "value": 33960,
+    "type": "history"
+  },
+  {
+    "date": "2012-10-01",
+    "value": 39664,
+    "type": "history"
+  },
+  {
+    "date": "2012-11-01",
+    "value": 35662,
+    "type": "history"
+  },
+  {
+    "date": "2012-12-01",
+    "value": 32781,
+    "type": "history"
+  },
+  {
+    "date": "2013-01-01",
+    "value": 41797,
+    "type": "history"
+  },
+  {
+    "date": "2013-02-01",
+    "value": 48540,
+    "type": "history"
+  },
+  {
+    "date": "2013-03-01",
+    "value": 41009,
+    "type": "history"
+  },
+  {
+    "date": "2013-04-01",
+    "value": 44201,
+    "type": "history"
+  },
+  {
+    "date": "2013-05-01",
+    "value": 34024,
+    "type": "history"
+  },
+  {
+    "date": "2013-06-01",
+    "value": 31420,
+    "type": "history"
+  },
+  {
+    "date": "2013-07-01",
+    "value": 34900,
+    "type": "history"
+  },
+  {
+    "date": "2013-08-01",
+    "value": 37583,
+    "type": "history"
+  },
+  {
+    "date": "2013-09-01",
+    "value": 39384,
+    "type": "history"
+  },
+  {
+    "date": "2013-10-01",
+    "value": 46667,
+    "type": "history"
+  },
+  {
+    "date": "2013-11-01",
+    "value": 49188,
+    "type": "history"
+  },
+  {
+    "date": "2013-12-01",
+    "value": 44750,
+    "type": "history"
+  },
+  {
+    "date": "2014-01-01",
+    "value": 48177,
+    "type": "history"
+  },
+  {
+    "date": "2014-02-01",
+    "value": 51251,
+    "type": "history"
+  },
+  {
+    "date": "2014-03-01",
+    "value": 63706,
+    "type": "history"
+  },
+  {
+    "date": "2014-04-01",
+    "value": 50666,
+    "type": "history"
+  },
+  {
+    "date": "2014-05-01",
+    "value": 49712,
+    "type": "history"
+  },
+  {
+    "date": "2014-06-01",
+    "value": 45972,
+    "type": "history"
+  },
+  {
+    "date": "2014-07-01",
+    "value": 51612,
+    "type": "history"
+  },
+  {
+    "date": "2014-08-01",
+    "value": 57725,
+    "type": "history"
+  },
+  {
+    "date": "2014-09-01",
+    "value": 52599,
+    "type": "history"
+  },
+  {
+    "date": "2014-10-01",
+    "value": 58863,
+    "type": "history"
+  },
+  {
+    "date": "2014-11-01",
+    "value": 55353,
+    "type": "history"
+  },
+  {
+    "date": "2014-12-01",
+    "value": 58823,
+    "type": "history"
+  },
+  {
+    "date": "2015-01-01",
+    "value": 48464,
+    "type": "history"
+  },
+  {
+    "date": "2015-02-01",
+    "value": 47733,
+    "type": "history"
+  },
+  {
+    "date": "2015-03-01",
+    "value": 53218,
+    "type": "history"
+  },
+  {
+    "date": "2015-04-01",
+    "value": 49521,
+    "type": "history"
+  },
+  {
+    "date": "2015-05-01",
+    "value": 46837,
+    "type": "history"
+  },
+  {
+    "date": "2015-06-01",
+    "value": 49207,
+    "type": "history"
+  },
+  {
+    "date": "2015-07-01",
+    "value": 44710,
+    "type": "history"
+  },
+  {
+    "date": "2015-08-01",
+    "value": 50797,
+    "type": "history"
+  },
+  {
+    "date": "2015-09-01",
+    "value": 54167,
+    "type": "history"
+  },
+  {
+    "date": "2015-10-01",
+    "value": 58290,
+    "type": "history"
+  },
+  {
+    "date": "2015-11-01",
+    "value": 61947,
+    "type": "history"
+  },
+  {
+    "date": "2015-12-01",
+    "value": 56993,
+    "type": "history"
+  },
+  {
+    "date": "2016-01-01",
+    "value": 63818,
+    "type": "history"
+  },
+  {
+    "date": "2016-02-01",
+    "value": 56435,
+    "type": "history"
+  },
+  {
+    "date": "2016-03-01",
+    "value": 47312,
+    "type": "history"
+  },
+  {
+    "date": "2016-04-01",
+    "value": 37088,
+    "type": "history"
+  },
+  {
+    "date": "2016-05-01",
+    "value": 28148,
+    "type": "history"
+  },
+  {
+    "date": "2016-06-01",
+    "value": 39652,
+    "type": "history"
+  },
+  {
+    "date": "2016-07-01",
+    "value": 37675,
+    "type": "history"
+  },
+  {
+    "date": "2016-08-01",
+    "value": 42576,
+    "type": "history"
+  },
+  {
+    "date": "2016-09-01",
+    "value": 39850,
+    "type": "history"
+  },
+  {
+    "date": "2016-10-01",
+    "value": 45742,
+    "type": "history"
+  },
+  {
+    "date": "2016-11-01",
+    "value": 48131,
+    "type": "history"
+  },
+  {
+    "date": "2016-12-01",
+    "value": 45798,
+    "type": "history"
+  },
+  {
+    "date": "2017-01-01",
+    "value": 45948,
+    "type": "history"
+  },
+  {
+    "date": "2017-02-01",
+    "value": 46113,
+    "type": "history"
+  },
+  {
+    "date": "2017-03-01",
+    "value": 47155,
+    "type": "history"
+  },
+  {
+    "date": "2017-04-01",
+    "value": 46755,
+    "type": "history"
+  },
+  {
+    "date": "2017-05-01",
+    "value": 48125,
+    "type": "history"
+  },
+  {
+    "date": "2017-06-01",
+    "value": 44105,
+    "type": "history"
+  },
+  {
+    "date": "2017-07-01",
+    "value": 45516,
+    "type": "history"
+  },
+  {
+    "date": "2017-08-01",
+    "value": 50737,
+    "type": "history"
+  },
+  {
+    "date": "2017-09-01",
+    "value": 56577,
+    "type": "history"
+  },
+  {
+    "date": "2017-10-01",
+    "value": 58110,
+    "type": "history"
+  },
+  {
+    "date": "2017-11-01",
+    "value": 63490,
+    "type": "history"
+  },
+  {
+    "date": "2017-12-01",
+    "value": 61542,
+    "type": "history"
+  },
+  {
+    "date": "2018-01-01",
+    "value": 65084,
+    "type": "history"
+  },
+  {
+    "date": "2018-02-01",
+    "value": 55262,
+    "type": "history"
+  },
+  {
+    "date": "2018-03-01",
+    "value": 51725,
+    "type": "history"
+  },
+  {
+    "date": "2018-04-01",
+    "value": 44101,
+    "type": "history"
+  },
+  {
+    "date": "2018-05-01",
+    "value": 53108,
+    "type": "history"
+  },
+  {
+    "date": "2018-06-01",
+    "value": 49282,
+    "type": "history"
+  },
+  {
+    "date": "2018-07-01",
+    "value": 58339,
+    "type": "history"
+  },
+  {
+    "date": "2018-08-01",
+    "value": 51779,
+    "type": "history"
+  },
+  {
+    "date": "2018-09-01",
+    "value": 54760,
+    "type": "history"
+  },
+  {
+    "date": "2018-10-01",
+    "value": 67165,
+    "type": "history"
+  },
+  {
+    "date": "2018-11-01",
+    "value": 64180,
+    "type": "history"
+  },
+  {
+    "date": "2018-12-01",
+    "value": 54452,
+    "type": "history"
+  },
+  {
+    "date": "2019-01-01",
+    "value": 61694,
+    "type": "history"
+  },
+  {
+    "date": "2019-02-01",
+    "value": 56728,
+    "type": "history"
+  },
+  {
+    "date": "2019-03-01",
+    "value": 60769,
+    "type": "history"
+  },
+  {
+    "date": "2019-04-01",
+    "value": 52376,
+    "type": "history"
+  },
+  {
+    "date": "2019-05-01",
+    "value": 58141,
+    "type": "history"
+  },
+  {
+    "date": "2019-06-01",
+    "value": 51751,
+    "type": "history"
+  },
+  {
+    "date": "2019-07-01",
+    "value": 57019,
+    "type": "history"
+  },
+  {
+    "date": "2019-08-01",
+    "value": 61665,
+    "type": "history"
+  },
+  {
+    "date": "2019-09-01",
+    "value": 59267,
+    "type": "history"
+  },
+  {
+    "date": "2019-10-01",
+    "value": 54442,
+    "type": "history"
+  },
+  {
+    "date": "2019-11-01",
+    "value": 60620,
+    "type": "history"
+  },
+  {
+    "date": "2019-12-01",
+    "value": 67512,
+    "type": "history"
+  },
+  {
+    "date": "2020-01-01",
+    "value": 71258,
+    "type": "history"
+  },
+  {
+    "date": "2020-02-01",
+    "value": 64947,
+    "type": "history"
+  },
+  {
+    "date": "2020-03-01",
+    "value": 55711,
+    "type": "history"
+  },
+  {
+    "date": "2020-04-01",
+    "value": 53060,
+    "type": "history"
+  },
+  {
+    "date": "2020-05-01",
+    "value": 62463,
+    "type": "history"
+  },
+  {
+    "date": "2020-06-01",
+    "value": 63626,
+    "type": "history"
+  },
+  {
+    "date": "2020-07-01",
+    "value": 64510,
+    "type": "history"
+  },
+  {
+    "date": "2020-08-01",
+    "value": 67303,
+    "type": "history"
+  },
+  {
+    "date": "2020-09-01",
+    "value": 65363,
+    "type": "history"
+  },
+  {
+    "date": "2020-10-01",
+    "value": 75075,
+    "type": "history"
+  },
+  {
+    "date": "2020-11-01",
+    "value": 75853,
+    "type": "history"
+  },
+  {
+    "date": "2020-12-01",
+    "value": 67962,
+    "type": "history"
+  },
+  {
+    "date": "2021-01-01",
+    "value": 67779,
+    "type": "history"
+  },
+  {
+    "date": "2021-02-01",
+    "value": 70497,
+    "type": "history"
+  },
+  {
+    "date": "2021-03-01",
+    "value": 68537,
+    "type": "history"
+  },
+  {
+    "date": "2021-04-01",
+    "value": 58352,
+    "type": "history"
+  },
+  {
+    "date": "2021-05-01",
+    "value": 47040,
+    "type": "history"
+  },
+  {
+    "date": "2021-06-01",
+    "value": 46418,
+    "type": "history"
+  },
+  {
+    "date": "2021-07-01",
+    "value": 47716,
+    "type": "history"
+  },
+  {
+    "date": "2021-08-01",
+    "value": 57954,
+    "type": "history"
+  },
+  {
+    "date": "2021-09-01",
+    "value": 59865,
+    "type": "history"
+  },
+  {
+    "date": "2021-10-01",
+    "value": 65815,
+    "type": "history"
+  },
+  {
+    "date": "2021-11-01",
+    "value": 69140,
+    "type": "history"
+  },
+  {
+    "date": "2021-12-01",
+    "value": 66167,
+    "type": "history"
+  },
+  {
+    "date": "2022-01-01",
+    "value": 65189,
+    "type": "history"
+  },
+  {
+    "date": "2022-02-01",
+    "value": 55755,
+    "type": "history"
+  },
+  {
+    "date": "2022-03-01",
+    "value": 61319,
+    "type": "history"
+  },
+  {
+    "date": "2022-04-01",
+    "value": 49834,
+    "type": "history"
+  },
+  {
+    "date": "2022-05-01",
+    "value": 60232,
+    "type": "history"
+  },
+  {
+    "date": "2022-06-01",
+    "value": 60323,
+    "type": "history"
+  },
+  {
+    "date": "2022-07-01",
+    "value": 65658,
+    "type": "history"
+  },
+  {
+    "date": "2022-08-01",
+    "value": 76617,
+    "type": "history"
+  },
+  {
+    "date": "2022-09-01",
+    "value": 69861,
+    "type": "history"
+  },
+  {
+    "date": "2022-10-01",
+    "value": 66827,
+    "type": "history"
+  },
+  {
+    "date": "2022-11-01",
+    "value": 63949,
+    "type": "history"
+  },
+  {
+    "date": "2022-12-01",
+    "value": 63389,
+    "type": "history"
+  },
+  {
+    "date": "2023-01-01",
+    "value": 61388,
+    "type": "history"
+  },
+  {
+    "date": "2023-02-01",
+    "value": 57673,
+    "type": "history"
+  },
+  {
+    "date": "2023-03-01",
+    "value": 67793,
+    "type": "history"
+  },
+  {
+    "date": "2023-04-01",
+    "value": 59469,
+    "type": "history"
+  },
+  {
+    "date": "2023-05-01",
+    "value": 64764,
+    "type": "history"
+  },
+  {
+    "date": "2023-06-01",
+    "value": 59145,
+    "type": "history"
+  },
+  {
+    "date": "2023-07-01",
+    "value": 63308,
+    "type": "history"
+  },
+  {
+    "date": "2023-08-01",
+    "value": 74094,
+    "type": "history"
+  },
+  {
+    "date": "2023-09-01",
+    "value": 68462,
+    "type": "history"
+  },
+  {
+    "date": "2023-10-01",
+    "value": 61939,
+    "type": "history"
+  },
+  {
+    "date": "2023-11-01",
+    "value": 66634,
+    "type": "history"
+  },
+  {
+    "date": "2023-12-01",
+    "value": 64570,
+    "type": "history"
+  },
+  {
+    "date": "2024-01-01",
+    "value": 59922,
+    "type": "history"
+  },
+  {
+    "date": "2024-02-01",
+    "value": 50036,
+    "type": "history"
+  },
+  {
+    "date": "2024-03-01",
+    "value": 47853,
+    "type": "history"
+  },
+  {
+    "date": "2024-04-01",
+    "value": 49158,
+    "type": "history"
+  },
+  {
+    "date": "2024-05-01",
+    "value": 55031,
+    "type": "history"
+  },
+  {
+    "date": "2024-06-01",
+    "value": 55143,
+    "type": "history"
+  },
+  {
+    "date": "2024-07-01",
+    "value": 65836,
+    "type": "history"
+  },
+  {
+    "date": "2024-08-01",
+    "value": 72356,
+    "type": "history"
+  },
+  {
+    "date": "2024-09-01",
+    "value": 62439,
+    "type": "history"
+  },
+  {
+    "date": "2024-10-01",
+    "value": 70098,
+    "type": "history"
+  },
+  {
+    "date": "2024-11-01",
+    "value": 61670,
+    "type": "history"
+  },
+  {
+    "date": "2024-12-01",
+    "value": 55129,
+    "type": "history"
+  },
+  {
+    "date": "2025-01-01",
+    "value": 71038.38,
+    "type": "prediction"
+  },
+  {
+    "date": "2025-02-01",
+    "value": 69622.82,
+    "type": "prediction"
+  },
+  {
+    "date": "2025-03-01",
+    "value": 69431.9,
+    "type": "prediction"
+  },
+  {
+    "date": "2025-04-01",
+    "value": 65580.56,
+    "type": "prediction"
+  },
+  {
+    "date": "2025-05-01",
+    "value": 66636.47,
+    "type": "prediction"
+  },
+  {
+    "date": "2025-06-01",
+    "value": 66247.84,
+    "type": "prediction"
+  },
+  {
+    "date": "2025-07-01",
+    "value": 67878.33,
+    "type": "prediction"
+  },
+  {
+    "date": "2025-08-01",
+    "value": 71107.13,
+    "type": "prediction"
+  },
+  {
+    "date": "2025-09-01",
+    "value": 70048.94,
+    "type": "prediction"
+  },
+  {
+    "date": "2025-10-01",
+    "value": 73139.02,
+    "type": "prediction"
+  },
+  {
+    "date": "2025-11-01",
+    "value": 74259.67,
+    "type": "prediction"
+  },
+  {
+    "date": "2025-12-01",
+    "value": 72114.12,
+    "type": "prediction"
+  },
+  {
+    "date": "2026-01-01",
+    "value": 72881.48,
+    "type": "prediction"
+  },
+  {
+    "date": "2026-02-01",
+    "value": 70977.91,
+    "type": "prediction"
+  },
+  {
+    "date": "2026-03-01",
+    "value": 72556.82,
+    "type": "prediction"
+  },
+  {
+    "date": "2026-04-01",
+    "value": 67678.98,
+    "type": "prediction"
+  },
+  {
+    "date": "2026-05-01",
+    "value": 69182.47,
+    "type": "prediction"
+  },
+  {
+    "date": "2026-06-01",
+    "value": 68259.13,
+    "type": "prediction"
+  },
+  {
+    "date": "2026-07-01",
+    "value": 69814.97,
+    "type": "prediction"
+  },
+  {
+    "date": "2026-08-01",
+    "value": 73360.7,
+    "type": "prediction"
+  },
+  {
+    "date": "2026-09-01",
+    "value": 72482.87,
+    "type": "prediction"
+  },
+  {
+    "date": "2026-10-01",
+    "value": 75074.84,
+    "type": "prediction"
+  },
+  {
+    "date": "2026-11-01",
+    "value": 76736.26,
+    "type": "prediction"
+  },
+  {
+    "date": "2026-12-01",
+    "value": 74893.51,
+    "type": "prediction"
+  }
+]

@@ -131,12 +131,10 @@ def main():
     print(f"Columns found: {df.columns.tolist()}")
     
     # Smart Species Column Detection
-    # Prioritize columns with 'ESPECIE' but exclude 'COD', 'CD', 'ID' to find the name
     species_candidates = [c for c in df.columns if 'ESPECIE' in c]
     name_candidates = [c for c in species_candidates if not any(x in c for x in ['COD', 'CD', 'ID'])]
     
     if name_candidates:
-        # Prefer column with 'NOM' or 'NOMBRE'
         best_name = next((c for c in name_candidates if 'NOM' in c), None)
         if best_name:
             species_col = best_name
@@ -150,11 +148,9 @@ def main():
     region_col = next((c for c in df.columns if 'REGION' in c), None)
 
     # Smart Value Column Detection
-    # 1. Priority: Exact matches
     priority_cols = ['TONELADAS', 'TONELADA', 'VALOR', 'PESO', 'DESEMBARQUE']
     val_col = next((c for c in df.columns if c in priority_cols), None)
     
-    # 2. Fallback: Contains 'TON' or 'DESEMBARQUE' but NOT 'REGION', 'CODIGO', 'FECHA'
     if not val_col:
         candidates = [c for c in df.columns if ('TON' in c or 'DESEMBARQUE' in c) 
                       and not any(x in c for x in ['REGION', 'CODIGO', 'FECHA', 'NOM'])]
@@ -168,13 +164,11 @@ def main():
         sys.exit(1)
 
     # Clean Value
-    # Force to numeric, coerce errors to NaN
     if df[val_col].dtype == object:
         df[val_col] = df[val_col].astype(str).str.replace(',', '.')
         
     df[val_col] = pd.to_numeric(df[val_col], errors='coerce')
     
-    # Drop rows with NaN values in value column
     initial_len = len(df)
     df = df.dropna(subset=[val_col])
     if len(df) < initial_len:
@@ -190,6 +184,51 @@ def main():
     else:
         print("Error: Could not create date column.")
         sys.exit(1)
+
+    # --- REGION NORMALIZATION ---
+    def normalize_region(name):
+        if not isinstance(name, str):
+            return "DESCONOCIDA"
+        
+        name = name.upper().strip()
+        
+        # Remove accents
+        replacements = {
+            'Á': 'A', 'É': 'E', 'Í': 'I', 'Ó': 'O', 'Ú': 'U',
+            'Ü': 'U', 'Ñ': 'N'
+        }
+        for old, new in replacements.items():
+            name = name.replace(old, new)
+            
+        # Remove common prefixes
+        name = name.replace("REGION DE ", "").replace("REGION ", "").replace("PROVINCIA DE ", "")
+        
+        # Map known cases
+        if "LAGOS" in name or "X REGION" in name or "DECIMA" in name:
+            return "LAGOS"
+        if "AYSEN" in name or "XI REGION" in name or "UNDECIMA" in name:
+            return "AYSEN"
+        if "MAGALLANES" in name or "XII REGION" in name or "DUODECIMA" in name or "ANTARTICA" in name:
+            return "MAGALLANES"
+        if "BIOBIO" in name or "VIII REGION" in name:
+            return "BIOBIO"
+        if "ARAUCANIA" in name or "IX REGION" in name:
+            return "ARAUCANIA"
+        if "ATACAMA" in name or "III REGION" in name:
+            return "ATACAMA"
+        if "COQUIMBO" in name or "IV REGION" in name:
+            return "COQUIMBO"
+            
+        return name
+
+    if region_col:
+        print("Normalizing regions...")
+        df['Region_Norm'] = df[region_col].apply(normalize_region)
+        print("Region counts after normalization:")
+        print(df['Region_Norm'].value_counts().head(10))
+    else:
+        print("Warning: No region column found. Skipping regional analysis.")
+        df['Region_Norm'] = "NACIONAL"
 
     # 2. Identify Top 5 Species
     print("Identifying Top 5 Species...")
@@ -213,23 +252,23 @@ def main():
         
         all_predictions[species]['TODAS'] = get_forecast(df_national)
         
-        # --- B. Regional Level (Optional/Key Regions) ---
-        # Let's do it for all regions that have significant data, or just key ones?
-        # Prompt says: "Opcional (Si es rápido): Entrena también modelos específicos para las regiones clave (Lagos, Aysén, Magallanes)"
-        # Let's try to do it for top 3 regions for that species to keep it fast.
-        
+        # --- B. Regional Level (Key Regions) ---
         if region_col:
-            top_regions = df_species.groupby(region_col)[val_col].sum().sort_values(ascending=False).head(3).index.tolist()
-            for region in top_regions:
-                # Clean region name for JSON key (optional, but good practice)
-                region_key = str(region).upper().strip()
-                print(f"  > Training Regional Model: {region_key}...")
+            target_regions = ['LAGOS', 'AYSEN', 'MAGALLANES']
+            
+            for region_key in target_regions:
+                df_region = df_species[df_species['Region_Norm'] == region_key].copy()
                 
-                df_region = df_species[df_species[region_col] == region].copy()
-                df_region_agg = df_region.groupby('date')[val_col].sum().reset_index()
-                df_region_agg.columns = ['date', 'value']
+                count = len(df_region)
+                print(f"  > Checking region {region_key}: {count} records found.")
                 
-                all_predictions[species][region_key] = get_forecast(df_region_agg)
+                if count > 12: # Min data requirement
+                    print(f"  > Training Regional Model: {region_key}...")
+                    df_region_agg = df_region.groupby('date')[val_col].sum().reset_index()
+                    df_region_agg.columns = ['date', 'value']
+                    all_predictions[species][region_key] = get_forecast(df_region_agg)
+                else:
+                    print(f"  > Skipping {region_key} (Insufficient data: {count})")
 
     # 4. Save Output
     save_json(all_predictions, OUTPUT_FILE)

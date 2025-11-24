@@ -16,28 +16,16 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Servir archivos estáticos (ajusta 'frontend/dist' si es Vite o 'frontend/build' si es CRA)
+app.use(express.static(path.join(__dirname, 'frontend/dist')));
+
 // API Routes (antes de servir archivos estáticos)
 app.use('/api', routes);
 
-// Servir archivos estáticos del frontend en producción
-if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(__dirname, 'frontend', 'dist');
-  app.use(express.static(frontendPath));
-  
-  // Todas las rutas no-API sirven el index.html (para React Router)
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-  });
-} else {
-  // En desarrollo, solo mostrar mensaje en la raíz
-  app.get('/', (req, res) => {
-    res.json({ 
-      message: 'Servidor Express funcionando correctamente',
-      version: '1.0.0',
-      mode: 'development'
-    });
-  });
-}
+// Catch-all handler: Cualquier petición que no sea API, devuelve el React App
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend/dist', 'index.html'));
+});
 
 // Puerto del servidor
 const PORT = process.env.PORT || 3000;

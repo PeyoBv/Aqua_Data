@@ -78,6 +78,30 @@ function getDataStats() {
 }
 
 /**
+ * Obtiene la lista de especies únicas, opcionalmente filtrada por región
+ * @param {string} region - Región para filtrar (opcional)
+ * @returns {Array<string>} Lista de especies ordenadas alfabéticamente
+ */
+function getUniqueSpecies(region = null) {
+  let data = desembarques;
+
+  // Filtrar por región si se proporciona
+  if (region && region !== 'TODAS' && region !== '') {
+    data = data.filter(d => d.region === region);
+  }
+
+  // Extraer especies únicas
+  const speciesSet = new Set();
+  data.forEach(d => {
+    if (d.especie) {
+      speciesSet.add(d.especie);
+    }
+  });
+
+  return Array.from(speciesSet).sort();
+}
+
+/**
  * Inicializa todos los datos con los valores proporcionados
  * @param {Object} data - Objeto con todos los datos
  */
@@ -95,5 +119,6 @@ module.exports = {
   setPlantas,
   getPlantas,
   getDataStats,
-  initializeData
+  initializeData,
+  getUniqueSpecies
 };

@@ -78,6 +78,26 @@ class DataController {
       });
     }
   }
+
+  /**
+   * Obtiene opciones de especies, filtradas por región
+   */
+  static getSpeciesOptions(req, res) {
+    try {
+      const { region } = req.query;
+      const species = dataStore.getUniqueSpecies(region);
+      res.json({
+        success: true,
+        count: species.length,
+        data: species
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
 }
 
 module.exports = DataController;

@@ -23,10 +23,43 @@ const Filters = ({ onFilterChange, filters }) => {
     'Aysén',
     'Magallanes',
     'Metropolitana',
-    'Los Ríos',
     'Arica y Parinacota',
     'Ñuble'
   ];
+
+  // Estado para opciones de especies
+  const [speciesOptions, setSpeciesOptions] = React.useState([]);
+  const [loadingSpecies, setLoadingSpecies] = React.useState(false);
+
+  // Efecto para cargar especies cuando cambia la región
+  React.useEffect(() => {
+    const fetchSpecies = async () => {
+      setLoadingSpecies(true);
+      try {
+        const regionParam = filters.region ? `?region=${encodeURIComponent(filters.region)}` : '';
+        const response = await fetch(`/api/data/options/species${regionParam}`);
+        const result = await response.json();
+
+        if (result.success) {
+          setSpeciesOptions(result.data);
+
+          // Si la especie seleccionada ya no está disponible, resetearla
+          if (filters.especie && !result.data.includes(filters.especie)) {
+            onFilterChange({
+              ...filters,
+              especie: null
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error cargando especies:', error);
+      } finally {
+        setLoadingSpecies(false);
+      }
+    };
+
+    fetchSpecies();
+  }, [filters.region]);
 
   const handleYearChange = (e) => {
     const value = e.target.value;
@@ -68,7 +101,7 @@ const Filters = ({ onFilterChange, filters }) => {
           🔄 Resetear Filtros
         </button>
       </div>
-      
+
       <div className="filters-grid">
         <div className="filter-group">
           <label htmlFor="year-select">Año</label>
@@ -101,15 +134,19 @@ const Filters = ({ onFilterChange, filters }) => {
         </div>
 
         <div className="filter-group">
-          <label htmlFor="especie-input">Especie</label>
-          <input
-            id="especie-input"
-            type="text"
+          <label htmlFor="especie-select">Especie</label>
+          <select
+            id="especie-select"
             value={filters.especie || ''}
             onChange={handleEspecieChange}
-            placeholder="Ej: Anchoveta, Jurel..."
-            className="filter-input"
-          />
+            className="filter-select"
+            disabled={loadingSpecies}
+          >
+            <option value="">Todas las especies</option>
+            {speciesOptions.map(specie => (
+              <option key={specie} value={specie}>{specie}</option>
+            ))}
+          </select>
         </div>
       </div>
     </div>

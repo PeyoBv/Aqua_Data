@@ -6,7 +6,7 @@ const { normalizarTexto, normalizarRegion } = require('../utils/normalizar');
  * Cruza datos de Cosechas (df_desembarque) con Producción (df_produccion)
  */
 class ComparadorService {
-  
+
   /**
    * Obtiene especies que existen en ambos datasets (Cosechas y Producción)
    * ACTUALIZADO: Usa LEFT JOIN (base = desembarques) para mostrar especies
@@ -42,10 +42,10 @@ class ComparadorService {
       const todasEspecies = [...especiesCosechas].sort();
 
       // Clasificar especies para métricas
-      const especiesConProcesamiento = todasEspecies.filter(especie => 
+      const especiesConProcesamiento = todasEspecies.filter(especie =>
         especiesProduccion.has(especie)
       );
-      const especiesSinProcesamiento = todasEspecies.filter(especie => 
+      const especiesSinProcesamiento = todasEspecies.filter(especie =>
         !especiesProduccion.has(especie)
       );
 
@@ -62,7 +62,7 @@ class ComparadorService {
           totalCapturadas: todasEspecies.length,
           conProcesamiento: especiesConProcesamiento.length,
           sinProcesamiento: especiesSinProcesamiento.length,
-          porcentajeProcesado: todasEspecies.length > 0 
+          porcentajeProcesado: todasEspecies.length > 0
             ? ((especiesConProcesamiento.length / todasEspecies.length) * 100).toFixed(1)
             : 0
         }
@@ -97,25 +97,25 @@ class ComparadorService {
       const especieNorm = normalizarTexto(especie);
 
       // Filtrar desembarques por especie (y región si aplica)
-      let desembarques = df_desembarque.filter(row => 
+      let desembarques = df_desembarque.filter(row =>
         normalizarTexto(row.especie) === especieNorm
       );
 
       if (region !== 'TODAS') {
         const regionNorm = normalizarRegion(region);
-        desembarques = desembarques.filter(row => 
+        desembarques = desembarques.filter(row =>
           normalizarRegion(row.region) === regionNorm
         );
       }
 
       // Filtrar producción por especie (y región si aplica)
-      let produccion = df_produccion.filter(row => 
+      let produccion = df_produccion.filter(row =>
         normalizarTexto(row.especie) === especieNorm
       );
 
       if (region !== 'TODAS') {
         const regionNorm = normalizarRegion(region);
-        produccion = produccion.filter(row => 
+        produccion = produccion.filter(row =>
           normalizarRegion(row.region) === regionNorm
         );
       }
@@ -141,7 +141,7 @@ class ComparadorService {
       // Rellena con 0 los años sin datos (especies no procesadas)
       // ========================================
       const anios = [];
-      for (let anio = 2010; anio <= 2024; anio++) {
+      for (let anio = 2000; anio <= 2024; anio++) {
         anios.push(anio);
       }
 
@@ -155,8 +155,8 @@ class ComparadorService {
       // Calcular estadísticas
       const totalDesembarque = data.reduce((sum, item) => sum + item.desembarque, 0);
       const totalMateriaPrima = data.reduce((sum, item) => sum + item.materiaPrima, 0);
-      const porcentajeProcesado = totalDesembarque > 0 
-        ? (totalMateriaPrima / totalDesembarque) * 100 
+      const porcentajeProcesado = totalDesembarque > 0
+        ? (totalMateriaPrima / totalDesembarque) * 100
         : 0;
 
       return {
@@ -256,13 +256,13 @@ class ComparadorService {
       const especieNorm = normalizarTexto(especie);
 
       // Filtrar producción por especie (y región si aplica)
-      let produccion = df_produccion.filter(row => 
+      let produccion = df_produccion.filter(row =>
         normalizarTexto(row.especie) === especieNorm
       );
 
       if (region !== 'TODAS') {
         const regionNorm = normalizarRegion(region);
-        produccion = produccion.filter(row => 
+        produccion = produccion.filter(row =>
           normalizarRegion(row.region) === regionNorm
         );
       }
@@ -276,7 +276,7 @@ class ComparadorService {
 
       // Agrupar por Año y Línea de Elaboración
       const agrupado = {};
-      
+
       produccion.forEach(row => {
         const anio = row.año;
         const linea = normalizarTexto(row.linea_elaboracion || row.tipo_elaboracion || 'OTROS');
@@ -298,11 +298,11 @@ class ComparadorService {
 
       const lineas = Array.from(lineasSet).sort();
 
-      // Crear serie temporal (2010-2024) con todas las líneas
+      // Crear serie temporal (2000-2024) con todas las líneas
       const data = [];
-      for (let anio = 2010; anio <= 2024; anio++) {
+      for (let anio = 2000; anio <= 2024; anio++) {
         const punto = { año: anio };
-        
+
         lineas.forEach(linea => {
           punto[linea] = Math.round(agrupado[anio]?.[linea] || 0);
         });
@@ -381,10 +381,10 @@ class ComparadorService {
       // ========================================
 
       // Filtrar desembarques por especie
-      let desembarques = df_desembarque.filter(row => 
+      let desembarques = df_desembarque.filter(row =>
         normalizarTexto(row.especie) === especieNorm
       );
-      
+
       // Filtrar por año si aplica
       if (isYearFilter) {
         desembarques = desembarques.filter(row => {
@@ -397,17 +397,17 @@ class ComparadorService {
       // ✅ FILTRAR POR REGIÓN ANTES DEL GROUPBY (Backend Filtering)
       if (isRegionFilter) {
         const regionNorm = normalizarRegion(region);
-        desembarques = desembarques.filter(row => 
+        desembarques = desembarques.filter(row =>
           normalizarRegion(row.region) === regionNorm
         );
         console.log(`📊 [ComparacionRegional] Desembarques filtrados por región ${region}: ${desembarques.length} registros`);
       }
 
       // Filtrar producción por especie
-      let produccion = df_produccion.filter(row => 
+      let produccion = df_produccion.filter(row =>
         normalizarTexto(row.especie) === especieNorm
       );
-      
+
       // Filtrar por año si aplica
       if (isYearFilter) {
         produccion = produccion.filter(row => {
@@ -420,7 +420,7 @@ class ComparadorService {
       // ✅ FILTRAR POR REGIÓN ANTES DEL GROUPBY (Backend Filtering)
       if (isRegionFilter) {
         const regionNorm = normalizarRegion(region);
-        produccion = produccion.filter(row => 
+        produccion = produccion.filter(row =>
           normalizarRegion(row.region) === regionNorm
         );
         console.log(`📊 [ComparacionRegional] Producción filtrada por región ${region}: ${produccion.length} registros`);
@@ -429,7 +429,7 @@ class ComparadorService {
       if (desembarques.length === 0 && produccion.length === 0) {
         return {
           success: false,
-          error: isYearFilter 
+          error: isYearFilter
             ? `No hay datos para esta especie en el año ${year}`
             : 'No hay datos para esta especie'
         };
@@ -484,12 +484,12 @@ class ComparadorService {
         estadisticas: {
           totalCaptura: Math.round(totalCaptura),
           totalProcesamiento: Math.round(totalProcesamiento),
-          porcentajeProcesado: totalCaptura > 0 
+          porcentajeProcesado: totalCaptura > 0
             ? parseFloat(((totalProcesamiento / totalCaptura) * 100).toFixed(1))
             : 0,
           regionConMayorCaptura: data.length > 0 ? data[0].region : null,
-          regionConMayorProcesamiento: data.length > 0 
-            ? data.sort((a, b) => b.procesamiento - a.procesamiento)[0].region 
+          regionConMayorProcesamiento: data.length > 0
+            ? data.sort((a, b) => b.procesamiento - a.procesamiento)[0].region
             : null
         }
       };
@@ -533,37 +533,37 @@ class ComparadorService {
       // ========================================
       const calcularTotalesPorAno = (year) => {
         // Filtrar desembarques
-        let desembarques = df_desembarque.filter(row => 
+        let desembarques = df_desembarque.filter(row =>
           normalizarTexto(row.especie) === especieNorm &&
           parseInt(row.año || row.anio || row.ano || row.year) === parseInt(year)
         );
 
         if (isRegionFilter) {
           const regionNorm = normalizarRegion(region);
-          desembarques = desembarques.filter(row => 
+          desembarques = desembarques.filter(row =>
             normalizarRegion(row.region) === regionNorm
           );
         }
 
         // Filtrar producción
-        let produccion = df_produccion.filter(row => 
+        let produccion = df_produccion.filter(row =>
           normalizarTexto(row.especie) === especieNorm &&
           parseInt(row.año || row.anio || row.ano || row.year) === parseInt(year)
         );
 
         if (isRegionFilter) {
           const regionNorm = normalizarRegion(region);
-          produccion = produccion.filter(row => 
+          produccion = produccion.filter(row =>
             normalizarRegion(row.region) === regionNorm
           );
         }
 
         // Calcular totales
-        const totalCaptura = desembarques.reduce((sum, row) => 
+        const totalCaptura = desembarques.reduce((sum, row) =>
           sum + (parseFloat(row.toneladas) || 0), 0
         );
 
-        const totalProcesamiento = produccion.reduce((sum, row) => 
+        const totalProcesamiento = produccion.reduce((sum, row) =>
           sum + (parseFloat(row.toneladas_mp) || 0), 0
         );
 
@@ -635,7 +635,7 @@ class ComparadorService {
   static obtenerMatrizEstacionalidad(especie, region) {
     try {
       const especieNorm = normalizarTexto(especie);
-      
+
       // Verificar si la región es TODAS ANTES de normalizar
       const regionOriginal = String(region || '').trim().toUpperCase();
       const esTodasRegiones = regionOriginal === 'TODAS' || regionOriginal === '';
@@ -657,15 +657,15 @@ class ComparadorService {
       let debugCount = 0;
       const registrosFiltrados = df_desembarque.filter(row => {
         const especieMatch = normalizarTexto(row.especie) === especieNorm;
-        
+
         // Normalizar la región de la fila del CSV para comparar manzanas con manzanas
         const regionFilaNormalizada = normalizarRegion(row.region || row.Region || row.REGION || '');
-        
+
         // Si la región solicitada es TODAS, aceptar cualquier región
         const regionMatch = esTodasRegiones
-          ? true 
+          ? true
           : regionFilaNormalizada === regionNorm;
-        
+
         // Debug log para los primeros 5 registros que coinciden con la especie
         if (especieMatch && debugCount < 5) {
           console.log(`🔎 [Debug] Comparando:`, {
@@ -681,7 +681,7 @@ class ComparadorService {
           });
           debugCount++;
         }
-        
+
         // El objeto normalizado usa 'año' con ñ, no 'ano'
         return especieMatch && regionMatch && row.año && row.mes && row.toneladas;
       });
@@ -698,7 +698,7 @@ class ComparadorService {
 
       // Agrupar por Año y Mes, sumando toneladas
       const agrupado = {};
-      
+
       registrosFiltrados.forEach(row => {
         const year = parseInt(row.año); // Usar 'año' con ñ
         const month = parseInt(row.mes);
@@ -713,9 +713,12 @@ class ComparadorService {
         agrupado[year][month] += toneladas;
       });
 
-      // Obtener rango de años
-      const years = Object.keys(agrupado).map(y => parseInt(y)).sort((a, b) => b - a); // Descendente
-      
+      // Obtener rango de años (2000-2024)
+      const years = [];
+      for (let y = 2024; y >= 2000; y--) {
+        years.push(y);
+      }
+
       // Nombres de meses en español (orden 1-12)
       const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
@@ -726,7 +729,7 @@ class ComparadorService {
           months.push({
             month: m,
             monthName: monthNames[m - 1],
-            value: agrupado[year][m] || 0 // Relleno con 0 si no hay dato
+            value: agrupado[year]?.[m] || 0 // Relleno con 0 si no hay dato
           });
         }
         return {

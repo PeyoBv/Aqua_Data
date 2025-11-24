@@ -90,15 +90,19 @@ function getUniqueSpecies(region = null) {
     data = data.filter(d => d.region === region);
   }
 
-  // Extraer especies únicas
-  const speciesSet = new Set();
+  // Calcular suma por especie
+  const speciesMap = {};
   data.forEach(d => {
     if (d.especie) {
-      speciesSet.add(d.especie);
+      const tons = parseFloat(d.toneladas) || 0;
+      speciesMap[d.especie] = (speciesMap[d.especie] || 0) + tons;
     }
   });
 
-  return Array.from(speciesSet).sort();
+  // Filtrar especies con suma > 0
+  const validSpecies = Object.keys(speciesMap).filter(species => speciesMap[species] > 0);
+
+  return validSpecies.sort();
 }
 
 /**

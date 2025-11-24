@@ -123,6 +123,7 @@ const AreaLineChart = ({ data, title, description, viewMode, especie }) => {
               dataKey="año"
               stroke="#64748b"
               style={{ fontSize: '12px' }}
+              interval="preserveStartEnd"
             />
             <YAxis
               stroke="#64748b"

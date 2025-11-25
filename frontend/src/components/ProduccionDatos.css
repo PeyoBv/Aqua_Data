@@ -26,7 +26,7 @@
 
 /* Filtros */
 .filtros-section {
-  background: white;
+  background: var(--bg-card);
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 24px;
@@ -63,7 +63,7 @@
   border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 14px;
-  background: white;
+  background: var(--bg-card);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -143,7 +143,7 @@
   align-items: center;
   justify-content: center;
   padding: 60px 20px;
-  background: white;
+  background: var(--bg-card);
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -187,7 +187,7 @@
 
 /* No Data */
 .no-data-message {
-  background: white;
+  background: var(--bg-card);
   border-radius: 12px;
   padding: 40px 20px;
   text-align: center;
@@ -223,7 +223,7 @@
 }
 
 .filtros-tags .tag {
-  background: white;
+  background: var(--bg-card);
   border: 1px solid #d1d5db;
   border-radius: 6px;
   padding: 6px 12px;

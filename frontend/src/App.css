@@ -33,15 +33,18 @@ body {
 
 .app {
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  background: var(--bg-primary);
+  transition: background 0.3s ease;
 }
 
 /* ==================== HEADER ==================== */
 .app-header {
-  background: white;
+  background: var(--bg-card);
   box-shadow: var(--shadow-md);
   padding: 20px 0;
   margin-bottom: 30px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .header-content {
@@ -85,7 +88,7 @@ body {
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
-  background: white;
+  background: var(--bg-card);
   cursor: pointer;
   transition: var(--transition);
   min-width: 220px;
@@ -113,7 +116,7 @@ body {
 .nav-button {
   flex: 1;
   padding: 14px 24px;
-  background: white;
+  background: var(--bg-card);
   border: 2px solid transparent;
   border-radius: var(--radius);
   font-size: 16px;
@@ -146,11 +149,13 @@ body {
 
 /* ==================== SECCIONES ==================== */
 .section-header {
-  background: white;
+  background: var(--bg-card);
   padding: 24px;
   border-radius: var(--radius);
   margin-bottom: 24px;
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .section-header h2 {
@@ -181,10 +186,12 @@ body {
 }
 
 .chart-container {
-  background: white;
+  background: var(--bg-card);
   border-radius: var(--radius);
   padding: 24px;
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .chart-container h3 {
@@ -209,11 +216,13 @@ body {
 
 /* ==================== DATASET SELECTOR ==================== */
 .dataset-selector {
-  background: white;
+  background: var(--bg-card);
   padding: 20px;
   border-radius: var(--radius);
   margin-bottom: 20px;
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .dataset-selector label {
@@ -232,7 +241,7 @@ body {
 
 .dataset-button {
   padding: 14px 20px;
-  background: #f8fafc;
+  background: var(--bg-hover);
   border: 2px solid var(--border-color);
   border-radius: 8px;
   font-size: 15px;
@@ -243,8 +252,8 @@ body {
 }
 
 .dataset-button:hover {
-  background: #f1f5f9;
-  border-color: var(--primary-color);
+  background: var(--bg-hover);
+  border-color: var(--accent-color);
   color: var(--text-primary);
 }
 
@@ -257,11 +266,13 @@ body {
 
 /* ==================== FILTROS DINÁMICOS ==================== */
 .filtros-dinamicos {
-  background: white;
+  background: var(--bg-card);
   padding: 20px;
   border-radius: var(--radius);
   margin-bottom: 20px;
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .filtros-dinamicos h3 {
@@ -290,11 +301,13 @@ body {
   color: white;
   padding: 2px 8px;
   border-radius: 12px;
-  font-size: 11px;
-  margin-left: 8px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
+/* Filtros dinámicos - inputs y selects con !important para override */
+.explorador-datos .filtros-dinamicos .filtro-item input,
+.explorador-datos .filtros-dinamicos .filtro-item select,
+.explorador-datos .filtros-dinamicos .filtro-select,
 .filtro-item input,
 .filtro-item select,
 .filtro-select {
@@ -303,8 +316,8 @@ body {
   border: 2px solid var(--border-color);
   border-radius: 8px;
   font-size: 14px;
-  color: var(--text-primary);
-  background: white;
+  color: var(--text-primary) !important;
+  background: var(--bg-card) !important;
   transition: var(--transition);
   cursor: pointer;
   appearance: auto;
@@ -314,15 +327,8 @@ body {
 
 .filtro-item select option {
   padding: 8px;
-  background: white;
-  color: var(--text-primary);
-}
-
-.filtro-item select.has-value,
-.filtro-select:not([value=""]) {
-  border-color: #10b981;
-  background: #f0fdf4;
-  font-weight: 600;
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
 }
 
 .filtro-item input:focus,
@@ -336,29 +342,32 @@ body {
 .btn-limpiar {
   width: 100%;
   padding: 10px 16px;
-  background: #f1f5f9;
+  background: var(--bg-hover);
   border: 2px solid var(--border-color);
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   cursor: pointer;
   transition: var(--transition);
   margin-top: 22px;
 }
 
 .btn-limpiar:hover {
-  background: #e2e8f0;
+  background: var(--bg-card);
   color: var(--text-primary);
+  border-color: var(--border-hover);
 }
 
 /* ==================== ESTADÍSTICAS EXPLORADOR ==================== */
 .estadisticas-explorador {
-  background: white;
+  background: var(--bg-card);
   padding: 20px;
   border-radius: var(--radius);
   margin-bottom: 24px;
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .estadisticas-explorador h3 {
@@ -374,7 +383,7 @@ body {
 }
 
 .stat-card {
-  background: #f8fafc;
+  background: var(--bg-hover);
   padding: 16px;
   border-radius: 8px;
   border: 2px solid var(--border-color);
@@ -461,11 +470,13 @@ body {
 .loading-container,
 .error-container,
 .no-data-container {
-  background: white;
+  background: var(--bg-card);
   border-radius: var(--radius);
   padding: 60px 20px;
   text-align: center;
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .spinner {
@@ -515,11 +526,13 @@ body {
 
 /* ==================== FILTROS ACTIVOS ==================== */
 .filtros-activos {
-  background: white;
+  background: var(--bg-card);
   border-radius: var(--radius);
   padding: 16px 20px;
   box-shadow: var(--shadow-sm);
   margin-top: 20px;
+  border: 1px solid var(--border-color);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .filtros-activos p {
@@ -651,11 +664,11 @@ body {
 }
 
 .chart-half {
-  background: white;
+  background: var(--bg-card);
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   transition: var(--transition);
 }
 
@@ -665,11 +678,11 @@ body {
 }
 
 .chart-full {
-  background: white;
+  background: var(--bg-card);
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   margin-bottom: 1.5rem;
   transition: var(--transition);
 }
@@ -699,16 +712,17 @@ body {
 
 .view-mode-toggle {
   display: flex;
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--bg-card);
   padding: 4px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--border-color);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .toggle-btn {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-secondary);
   padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
@@ -721,12 +735,12 @@ body {
 }
 
 .toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 .toggle-btn.active {
-  background: white;
-  color: #1e3a8a;
+  background: var(--accent-color);
+  color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

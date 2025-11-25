@@ -90,7 +90,7 @@
 
 /* Área de captura para PDF */
 .pdf-capture-area {
-  background: white;
+  background: var(--bg-card);
   padding: 20px;
   border-radius: 12px;
 }
@@ -103,7 +103,7 @@
 
 /* Contenedores de gráficos */
 .chart-container {
-  background: white;
+  background: var(--bg-card);
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -119,7 +119,7 @@
 }
 
 .comparador-controls {
-  background: white;
+  background: var(--bg-card);
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -192,7 +192,7 @@
 }
 
 .destino-insights {
-  background: white;
+  background: var(--bg-card);
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);

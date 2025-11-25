@@ -8,7 +8,7 @@
 .chart-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-primary);
   margin: 0 0 1rem 0;
   text-align: center;
 }
@@ -18,26 +18,26 @@
   align-items: center;
   justify-content: center;
   height: 300px;
-  color: #64748b;
+  color: var(--text-muted);
   font-style: italic;
 }
 
 .custom-tooltip {
-  background: white;
+  background: var(--bg-card);
   padding: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .tooltip-label {
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-primary);
   margin: 0 0 4px 0;
 }
 
 .tooltip-value {
-  color: #64748b;
+  color: var(--text-secondary);
   margin: 0;
   font-size: 0.9rem;
 }

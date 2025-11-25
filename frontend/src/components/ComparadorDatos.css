@@ -22,7 +22,7 @@
 
 /* Configuración */
 .comparacion-config {
-  background: white;
+  background: var(--bg-card);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -62,7 +62,7 @@
   padding: 1rem;
   border: 2px solid #e2e8f0;
   border-radius: 10px;
-  background: white;
+  background: var(--bg-card);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -95,7 +95,7 @@
   padding: 1rem;
   border: 2px solid #e2e8f0;
   border-radius: 10px;
-  background: white;
+  background: var(--bg-card);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -137,7 +137,7 @@
   border: 2px solid #e2e8f0;
   border-radius: 8px;
   font-size: 1rem;
-  background: white;
+  background: var(--bg-card);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -194,7 +194,7 @@
   padding: 0.6rem;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
-  background: white;
+  background: var(--bg-card);
   font-size: 0.95rem;
   cursor: pointer;
   transition: border-color 0.2s;
@@ -266,7 +266,7 @@
   gap: 0.75rem;
   min-height: 50px;
   padding: 1rem;
-  background: white;
+  background: var(--bg-card);
   border-radius: 8px;
   border: 2px dashed #e2e8f0;
 }
@@ -322,7 +322,7 @@
 }
 
 .chart-container {
-  background: white;
+  background: var(--bg-card);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -336,7 +336,7 @@
 
 /* Tabla de Comparación */
 .tabla-comparacion {
-  background: white;
+  background: var(--bg-card);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -423,7 +423,7 @@
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
+  background: var(--bg-card);
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }

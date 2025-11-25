@@ -26,6 +26,7 @@ function App() {
           </div>
 
           <div className="header-controls">
+
             {/* Toggle Toneladas / USD */}
             <div className="view-mode-toggle">
               <button

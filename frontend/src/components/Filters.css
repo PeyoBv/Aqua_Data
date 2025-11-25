@@ -1,9 +1,11 @@
 .filters-container {
-  background: white;
+  background: var(--bg-card);
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 24px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .filters-header {
@@ -14,27 +16,28 @@
 }
 
 .filters-header h2 {
+  margin: 0;
+  color: var(--text-primary);
   font-size: 24px;
   font-weight: 700;
-  color: #1e293b;
-  margin: 0;
 }
 
 .reset-button {
-  background-color: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  color: #475569;
-  padding: 8px 16px;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
   border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
   font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
 }
 
 .reset-button:hover {
-  background-color: #e2e8f0;
-  border-color: #cbd5e1;
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .filters-grid {
@@ -50,33 +53,39 @@
 }
 
 .filter-group label {
-  font-size: 14px;
   font-weight: 600;
-  color: #475569;
+  color: var(--text-primary);
+  font-size: 14px;
 }
 
 .filter-select,
 .filter-input {
   padding: 10px 12px;
-  border: 1px solid #e2e8f0;
+  border: 2px solid var(--border-color);
   border-radius: 8px;
   font-size: 14px;
-  color: #1e293b;
-  background-color: #f8fafc;
-  transition: all 0.2s;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-select:hover,
+.filter-input:hover {
+  border-color: var(--accent-color);
 }
 
 .filter-select:focus,
 .filter-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  background-color: white;
+  border-color: var(--accent-color);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.filter-select:hover,
-.filter-input:hover {
-  border-color: #cbd5e1;
+.filter-select option {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  padding: 8px;
 }
 
 @media (max-width: 768px) {
@@ -85,11 +94,11 @@
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .filters-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .filters-container {
     padding: 16px;
   }

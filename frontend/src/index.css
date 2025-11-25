@@ -1,3 +1,47 @@
+/* ============================================
+   GLOBAL CSS VARIABLES - LIGHT MODE ONLY
+   ============================================ */
+
+:root {
+  /* Backgrounds */
+  --bg-primary: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-hover: #f1f5f9;
+
+  /* Text */
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+
+  /* Accent & Interactive */
+  --accent-color: #3b82f6;
+  --accent-hover: #2563eb;
+
+  /* Borders & Dividers */
+  --border-color: #e2e8f0;
+  --border-hover: #cbd5e1;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+
+  /* Chart Colors */
+  --chart-grid: #e2e8f0;
+  --chart-line-primary: #3b82f6;
+  --chart-line-secondary: #10b981;
+  --chart-area-fill: rgba(59, 130, 246, 0.1);
+
+  /* Transitions */
+  --transition: all 0.3s ease;
+  --radius: 12px;
+  --primary-color: #3b82f6;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
 * {
   margin: 0;
   padding: 0;
@@ -11,7 +55,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f5f7fa;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 code {
@@ -21,4 +66,5 @@ code {
 
 #root {
   min-height: 100vh;
+  background: var(--bg-primary);
 }

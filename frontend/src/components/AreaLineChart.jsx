@@ -18,6 +18,16 @@ import './ChartDescription.css';
  * Muestra Desembarque (área) vs Materia Prima (línea)
  */
 const AreaLineChart = ({ data, title, description, viewMode, especie }) => {
+  // Light mode colors only
+  const colors = {
+    primary: '#3b82f6',
+    secondary: '#10b981',
+    grid: '#e2e8f0',
+    text: '#64748b',
+    tooltipBg: 'rgba(255, 255, 255, 0.96)',
+    tooltipBorder: '#e2e8f0',
+    tooltipText: '#1e293b'
+  };
 
   // Transform data if viewMode is USD
   const chartData = React.useMemo(() => {
@@ -42,13 +52,13 @@ const AreaLineChart = ({ data, title, description, viewMode, especie }) => {
 
       return (
         <div style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.96)',
+          backgroundColor: colors.tooltipBg,
           padding: '12px',
-          border: '1px solid #e2e8f0',
+          border: `1px solid ${colors.tooltipBorder}`,
           borderRadius: '8px',
           boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
         }}>
-          <p style={{ margin: '0 0 8px 0', fontWeight: 'bold', color: '#1e293b' }}>
+          <p style={{ margin: '0 0 8px 0', fontWeight: 'bold', color: colors.tooltipText }}>
             Año {payload[0].payload.año}
           </p>
           <p style={{ margin: '4px 0', color: '#3b82f6', fontSize: '13px' }}>
@@ -118,15 +128,15 @@ const AreaLineChart = ({ data, title, description, viewMode, especie }) => {
             data={chartData}
             margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+            <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
             <XAxis
               dataKey="año"
-              stroke="#64748b"
+              stroke={colors.text}
               style={{ fontSize: '12px' }}
               interval="preserveStartEnd"
             />
             <YAxis
-              stroke="#64748b"
+              stroke={colors.text}
               style={{ fontSize: '12px' }}
               tickFormatter={getAxisFormatter(viewMode)}
               width={80}
@@ -142,9 +152,9 @@ const AreaLineChart = ({ data, title, description, viewMode, especie }) => {
               type="monotone"
               dataKey="desembarque"
               name="Desembarque Total"
-              fill="#3b82f6"
-              fillOpacity={0.3}
-              stroke="#3b82f6"
+              fill={colors.primary}
+              fillOpacity={isDark ? 0.2 : 0.3}
+              stroke={colors.primary}
               strokeWidth={2}
             />
 
@@ -153,9 +163,9 @@ const AreaLineChart = ({ data, title, description, viewMode, especie }) => {
               type="monotone"
               dataKey="materiaPrima"
               name="Materia Prima en Plantas"
-              stroke="#10b981"
+              stroke={colors.secondary}
               strokeWidth={3}
-              dot={{ fill: '#10b981', r: 4 }}
+              dot={{ fill: colors.secondary, r: 4 }}
               activeDot={{ r: 6 }}
             />
           </ComposedChart>
